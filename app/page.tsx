@@ -87,6 +87,99 @@ export default function Home() {
         </div>
       </div>
 
+      <div className="flex pb-20 px-6 md:px-14 lg:px-20 xl:px-28">
+        <div className="w-[55%] mr-2 md:mr-4">
+          <Image
+              src="/page_photos/kyra_wql_crop.jpg" 
+              width={1000} height={1000}
+              alt="phone icon"
+              style={{width:"100%", height:"100%"}}
+            />
+        </div>
+        <div className="w-[45%] max-h-[100%]">
+          <div className="">
+            <Image
+                src="/page_photos/ajay_sbs_crop.jpg" 
+                width={1000} height={1000}
+                alt="phone icon"  
+                style={{width:"100%", height:"100%"}}
+            />
+          </div>
+          <div className="mt-2 md:mt-4">
+            <Image
+                src="/page_photos/bowen_wql_crop.jpg"
+                width={1000} height={1000}
+                alt="phone icon"
+                style={{width:"100%", height:"100%"}}
+            />
+          </div>
+        </div>
+      </div>
+      
+      <div className="
+        bg-[#DFE3E5]
+        p-6 md:p-14 lg:p-20 xl:p-28
+        ">
+        <h3 className="
+          text-neutral-500 font-light
+          text-base/normal md:text-2xl/normal xl:text-4xl/normal
+        ">
+          HOW IT WORKS
+        </h3>
+        <h2 className="
+          font-ptserif font-bold 
+          text-2xl/tight md:text-4xl/normal lg:text-5xl/tight xl:text-6xl/tight"
+        >
+          More Effective, More Aesthetic, Less Work
+        </h2>
+        <div className="">
+          <Image 
+            src="/page_photos/panel_rendering_w_overlay_text.png" 
+            width={2400} height={2400}
+            style={{ width: '100%', maxWidth:'1024',height:'auto', minHeight:'35vh', margin:'0 auto',objectFit:'cover'}}
+            alt="man inserting whisper window soundproof panel into window"
+          />
+        </div>
+      </div>
+
+      <div className="
+        mt-6
+        p-6 md:p-14 lg:p-20 xl:p-28
+        ">
+        <h3 className="
+          text-neutral-500 font-light
+          text-base/normal md:text-2xl/normal xl:text-4xl/normal
+        ">
+          PRICING & PROCESS
+        </h3>
+        <h2 className="
+          font-ptserif font-bold 
+          text-2xl/tight md:text-4xl/normal lg:text-5xl/tight xl:text-6xl/tight"
+        >
+          Configure online, get it next week
+        </h2>
+        <div className="w-[95%] md:w-[85%]">
+          <p className="mt-6 font-medium">
+           Our best pricing is online!
+          </p>
+          <p className="mt-4 text-base/tight">
+           Go through our online questionnaire to select the product 
+           option that works best for you. We provide a full fit and satisfaction 
+           guarantee for all our orders placed online.
+          </p>
+          <button className="
+              rounded-full
+              my-4
+              pl-1.5 pr-10
+              border-2 border-brown-800 text-brown-800 
+              font-semibold
+              hover:border-brown-600 hover:text-brown-600 hover:drop-shadow-md 
+              hover:cursor-pointer
+            ">
+            Get a quote now
+          </button>
+        </div>
+      </div>
       <div className="z-10 w-full max-w-5xl items-center font-mukta text-sm bg-brown-50">
         <h1 className="font-ptserif font-bold text-lake-900 " >
           Testing
