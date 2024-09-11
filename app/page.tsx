@@ -1,6 +1,7 @@
 import Image from "next/image";
 import NavBar from "./components/navBar";
 import IconWithLabel from "./components/IconWithLabel";
+import HomepageTile from "./components/HomepageTile";
 
 export default function Home() {
   return (
@@ -159,97 +160,108 @@ export default function Home() {
           Configure online, get it next week
         </h2>
         <div className="w-[95%] md:w-[85%]">
-          <p className="mt-6 font-medium">
+          <p className="mt-10 font-bold">
            Our best pricing is online!
           </p>
-          <p className="mt-4 text-base/tight">
+          <p className="mt-2 mb-10 text-base">
            Go through our online questionnaire to select the product 
            option that works best for you. We provide a full fit and satisfaction 
            guarantee for all our orders placed online.
           </p>
           <button className="
-              rounded-full
-              my-4
-              pl-1.5 pr-10
-              border-2 border-brown-800 text-brown-800 
-              font-semibold
-              hover:border-brown-600 hover:text-brown-600 hover:drop-shadow-md 
-              hover:cursor-pointer
+            p-2 md:p-4 lg:px-6 rounded-sm
+            border-2 border-brown-800 text-brown-800 
+            font-semibold
+            hover:border-brown-600 hover:text-brown-600 hover:drop-shadow-md
             ">
             Get a quote now
           </button>
         </div>
       </div>
-      <div className="z-10 w-full max-w-5xl items-center font-mukta text-sm bg-brown-50">
-        <h1 className="font-ptserif font-bold text-lake-900 " >
-          Testing
-        </h1>
-        <p>Bleh regular</p>
-        <p className="font-medium">Belh medium</p>
-        <p className="font-bold">Belh medium</p>
-        <p className="font-bold">
-          dTrying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. 
+      <div className="
+        bg-brown-50 text-center
+        p-6 md:p-14 lg:p-20 xl:p-28
+        
+      ">
+        <h2 className="
+          w-[95%] md:w-[85%] m-auto
+          font-ptserif font-bold 
+          text-2xl/tight md:text-4xl/normal lg:text-5xl/tight xl:text-6xl/tight
+        ">
+          A solution so simple, it's even easy for renters
+        </h2>
+        <p className="my-6">
+          Our process is specifically tailored to meeting the needs of renters.
         </p>
-        <p className="font-bold">
-          Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. 
-        </p><p className="font-bold">
-          Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. 
-        </p><p className="font-bold">
-          Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. 
-        </p><p className="font-bold">
-          Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. Trying to put a lot of text in here, a lot of text in here, 
-          a lot of text in here. 
-        </p>
+        <button className="
+          bg-brown-950 text-white
+          rounded-full px-3 py-1
+        ">
+          Get the Renter's Speical
+        </button>
       </div>
+      <div className="p-6 md:p-14 lg:p-20 xl:p-28">
+        <h2 className="
+          font-ptserif font-bold 
+          text-xl/tight md:text-3xl/normal lg:text-4xl/tight xl:text-5xl/tight
+        ">
+          For every need...
+        </h2>
+        <div className="
+          flex overflow-x-scroll
+        ">
+          <HomepageTile
+            src="/page_photos/sleep-tile-480.png"
+            caption="Uninterrupted Sleep"
+          />
+          <HomepageTile
+            src="/page_photos/train-tile-480.png"
+            caption="Muffle Train Noises"
+          />
+          <HomepageTile
+            src="/page_photos/nursery-tile-480.png"
+            caption="Quiet & Dark Nursery"
+          />
+          <HomepageTile
+            src="/page_photos/winter-tile-480.png"
+            caption="Warm Winters"
+          />
+
+        </div>
+        <h2 className="
+          pt-10
+          text-right
+          font-ptserif font-bold 
+          text-xl/tight md:text-3xl/normal lg:text-4xl/tight xl:text-5xl/tight
+        ">
+          ...fits every home
+        </h2>
+        <div className="
+          flex overflow-x-scroll
+        ">
+          <HomepageTile
+            src="/page_photos/brownstone-tile-480.png"
+            caption="Brownstones"
+          />
+          <HomepageTile
+            src="/page_photos/historic-tile-480.png"
+            caption="Historic Homes"
+          />
+          <HomepageTile
+            src="/page_photos/curtain-wall-tile-480.png"
+            caption="Curtain Wall Skyscrapers"
+          />
+          <HomepageTile
+            src="/page_photos/studio-tile-480.png"
+            caption="Music Studios"
+          />
+
+        </div>
+      </div>
+      
 
       
-      <div className="bg-accent-mint h-[800px]">
-        place holder for another color
-      </div>
+      
     </main>
   );
 }
