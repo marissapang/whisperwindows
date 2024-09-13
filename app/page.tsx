@@ -2,6 +2,7 @@ import Image from "next/image";
 import NavBar from "./components/navBar";
 import IconWithLabel from "./components/IconWithLabel";
 import HomepageTile from "./components/HomepageTile";
+import ContactForm from "./components/ContactForm";
 
 export default function Home() {
   return (
@@ -257,7 +258,9 @@ export default function Home() {
           />
 
         </div>
+        
       </div>
+      <ContactForm/>
       
 
       
