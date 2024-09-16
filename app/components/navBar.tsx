@@ -6,6 +6,15 @@ import Image from "next/image";
 
 export default function NavBar(){
 	const [navTop, setNavTop] = useState(true);
+	const [productClick, setProductClick] = useState("hidden")
+
+	const handleProductClick= () => {
+		if (productClick=="hidden"){
+			setProductClick("absolute")
+		}  else {
+			setProductClick("hidden")
+		}
+	}
 
 	useEffect(() => {
 		window.addEventListener('scroll', () => {
@@ -30,12 +39,24 @@ export default function NavBar(){
 					"w-full flex items-center justify-between px-4 py-2"
 				}
 			>
-				<div className="font-ptserif text-lg drop-shadow">
+				<div className="font-ptserif text-lg drop-shadow select-none">
 					Whisper Window
 					</div>
-				<div className="hidden md:flex">
-					<div className="pr-8 text-white/85 hover:text-white/100 hover:cursor-pointer">
-						Product
+				<div className="hidden md:flex select-none">
+					<div 
+						className="pr-8 text-white/85 hover:text-white/100 hover:cursor-pointer"	
+					>
+						<div onClick={handleProductClick}>
+							Product
+						</div>
+						<div 
+							className={productClick + " bg-brown-900 bg-opacity-75 p-4 mt-4 -ml-4 min-w-[250px] leading-8"}
+						>
+							<div>Product Picker</div>
+							<div>Magnetic Panels</div>
+							<div>Compression Inserts</div>
+							<div>Blackout & Privacy Add-Ons</div>
+						</div>
 					</div>
 					<div className="pr-8 text-white/85 hover:text-white/100 hover:cursor-pointer">
 						Use Cases

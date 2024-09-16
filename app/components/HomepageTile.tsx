@@ -9,7 +9,7 @@ export default function HomepageTile(props) {
 	            style={{ width: '100%', height: 'auto', objectFit:'cover', borderRadius:'5px'}}
 	            alt={props.caption}
           	/>
-          <div className='pt-1 pb-6 font-medium'>
+          <div className='pt-1 pb-6 text-lg font-medium'>
           	{props.caption}
           </div>
 		</div>
