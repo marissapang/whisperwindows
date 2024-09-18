@@ -1,18 +1,20 @@
 "use client";
 import { useState, useEffect } from "react";
+
 import { math } from "mathjs";
 import Image from "next/image";
 
 
 export default function NavBar(){
 	const [navTop, setNavTop] = useState(true);
-	const [productClick, setProductClick] = useState("hidden")
+	const [navSelection, setNavSelection] = useState("");
+	const [mobileMenu, setMobileMenu] = useState("hidden")
 
-	const handleProductClick= () => {
-		if (productClick=="hidden"){
-			setProductClick("absolute")
-		}  else {
-			setProductClick("hidden")
+	const handleNavClick= (e) => {
+		if (e.target.id !== navSelection){
+			setNavSelection(e.target.id)
+		} else {
+			setNavSelection("")
 		}
 	}
 
@@ -23,7 +25,20 @@ export default function NavBar(){
 			} else if (Math.round(window.scrollY) <= window.innerHeight * 0.4) {
 				setNavTop(true)
 			}
+		});
+
+		window.addEventListener('click', (e) => {
+			const id = e.target.id
+			if ((id !== "product") && (id !== "usecases") && (id !== "about") && (id !== "resources")){
+				setNavSelection("")
+			}
 		})
+
+		if (mobileMenu==="hidden"){
+			document.body.classList.remove("overflow-y-hidden")
+		} else {
+			document.body.classList.add("overflow-y-hidden")
+		}
 	})
 	return (
 		<div className={
@@ -43,29 +58,55 @@ export default function NavBar(){
 					Whisper Window
 					</div>
 				<div className="hidden md:flex select-none">
-					<div 
-						className="pr-8 text-white/85 hover:text-white/100 hover:cursor-pointer"	
-					>
-						<div onClick={handleProductClick}>
+					<div className="pr-8">
+						<div id="product" onClick={handleNavClick} 
+							className={(navSelection==="product"? "text-white/100 underline hover:cursor-pointer" : "text-white/80 hover:text-white/100 hover:cursor-pointer")}>
 							Product
 						</div>
 						<div 
-							className={productClick + " bg-brown-900 bg-opacity-75 p-4 mt-4 -ml-4 min-w-[250px] leading-8"}
+							className={(navSelection==="product" ? "absolute":"hidden") + " bg-brown-900 bg-opacity-75 p-4 mt-4 -ml-4 min-w-[250px] leading-8"}
 						>
-							<div>Product Picker</div>
-							<div>Magnetic Panels</div>
-							<div>Compression Inserts</div>
-							<div>Blackout & Privacy Add-Ons</div>
+							<div className="text-white/80 hover:text-white/100 hover:cursor-pointer">
+								Product Picker
+							</div>
+							<div className="text-white/80 hover:text-white/100 hover:cursor-pointer">
+								Magnetic Panels
+							</div>
+							<div className="text-white/80 hover:text-white/100 hover:cursor-pointer">
+								Compression Inserts
+							</div>
+							<div className="text-white/80 hover:text-white/100 hover:cursor-pointer">
+								Blackout & Privacy Add-Ons
+							</div>
 						</div>
 					</div>
-					<div className="pr-8 text-white/85 hover:text-white/100 hover:cursor-pointer">
-						Use Cases
+					<div className="pr-8">
+						<div id="usecases" onClick={handleNavClick} 
+							className={(navSelection==="usecases"? "text-white/100 underline hover:cursor-pointer" : "text-white/80 hover:text-white/100 hover:cursor-pointer")}>
+							Use Cases
+						</div>
+						<div 
+							className={(navSelection==="usecases" ? "absolute":"hidden") + " bg-brown-900 bg-opacity-75 p-4 mt-4 -ml-4 min-w-[250px] leading-8"}
+						>
+							<div className="text-white/80 hover:text-white/100 hover:cursor-pointer">
+								Double-Hung Windows
+							</div>
+							<div className="text-white/80 hover:text-white/100 hover:cursor-pointer">
+								Temperature Insulation
+							</div>
+						</div>
 					</div>
-					<div className="pr-8 text-white/85 hover:text-white/100 hover:cursor-pointer">
-						About
+					<div className="pr-8">
+						<div id="about" onClick={handleNavClick}
+							className={(navSelection==="about"? "text-white/100 underline hover:cursor-pointer" : "text-white/80 hover:text-white/100 hover:cursor-pointer")}>
+							About
+						</div>
 					</div>
-					<div className="text-white/85 hover:text-white/100 hover:cursor-pointer">
-						Resources
+					<div className="pr-8">
+						<div id="resources" onClick={handleNavClick}
+							className={(navSelection==="resources"? "text-white/100 underline hover:cursor-pointer" : "text-white/80 hover:text-white/100 hover:cursor-pointer")}>
+							Resources
+						</div>
 					</div>
 				</div>
 				<div className="flex">
@@ -87,7 +128,54 @@ export default function NavBar(){
 							alt="phone icon"
 						/>
 					</div>
-					<div className="md:hidden">Burger</div>
+					<div className="md:hidden">
+						<div onClick={()=>{setMobileMenu("block")}} className="hover:cursor-pointer">
+							<Image 
+								src="/icons/burger-240px.png" 
+								width={20} height={20} alt="burger menu"
+							/>
+						</div>	
+					</div>
+					
+				</div>
+				
+			</div>
+			<div 
+				className={mobileMenu +
+				" fixed top-0 left-0 w-full h-[100vh]" +
+				" text-3xl text-brown-800 bg-brown-50 bg-opacity-[.99]" + 
+				" p-4"
+			}>
+				<div className="text-right">
+					<span 
+						onClick={()=>{setMobileMenu("hidden")}}
+						className="p-2 hover:cursor-pointer hover:text-brown-600"
+					>
+						X
+					</span>
+				</div>
+				<div className="mt-20 hover:cursor-pointer hover:text-brown-600">
+					Product
+				</div>
+				<hr className="mt-4 mb-4 bg-brown-500"/>
+				<div className="hover:cursor-pointer hover:text-brown-600">
+					Use Cases
+				</div>
+				<hr className="mt-4 mb-4 bg-brown-500"/>
+				<div className="hover:cursor-pointer hover:text-brown-600">
+					About
+				</div>
+				<hr className="mt-4 mb-4 bg-brown-500"/>
+				<div className="hover:cursor-pointer hover:text-brown-600">
+					Resources
+				</div>
+				<hr className="mt-4 mb-4 bg-brown-500"/>
+				<div className="hover:cursor-pointer hover:text-brown-600">
+					Instant Quote
+				</div>
+				<hr className="mt-4 mb-4 bg-brown-500"/>
+				<div className="hover:cursor-pointer hover:text-brown-600">
+					Contact
 				</div>
 			</div>
 

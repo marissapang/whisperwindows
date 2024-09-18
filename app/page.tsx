@@ -5,6 +5,7 @@ import HomepageTile from "./components/HomepageTile";
 import ContactForm from "./components/ContactForm";
 
 export default function Home() {
+  
   return (
     <main className="font-mukta text-brown-900">
       <NavBar/>
@@ -15,6 +16,7 @@ export default function Home() {
             width={1600} height={1200}
             style={{ width: '100%', minHeight:'80vh', maxHeight: '100vh', objectFit:'cover'}}
             alt="man inserting whisper window soundproof panel into window"
+            priority={true}
           />
         </div>
         <div className="
