@@ -5,24 +5,23 @@ import emailjs from '@emailjs/browser';
 import { useFormFields } from '../libs/hooksLib';
 
 export default function ContactForm() {
-	const [formError, setFormError] = useState("")
-	// const form = useRef();
+	const [formError, setFormError] = useState(" ")
+     const [formSuccess, setFormSuccess] = useState(false)
 
-	const [fields, handleFieldChange] = useFormFields({ 
-		mingzi: "", 
-		youjian: "", 
-		dianhua: "",
-		youbian:"",
-		additional_info:"",
-		preferred_contact_method:"",
-		name:"", // honeypot
-		email:"", // honeypot
-	});
+     const emptyFormFields = { 
+          mingzi: "", 
+          youjian: "", 
+          dianhua: "",
+          youbian:"",
+          additional_info:"",
+          preferred_contact_method:"default",
+          name:"", // honeypot
+          email:"", // honeypot
+     }
 
-	const handleSubmit = () => {
-		console.log("Submit button is pressed")
-		console.log("fields")
-		console.log(fields)
+	const [fields, handleFieldChange, resetFields] = useFormFields(emptyFormFields);
+
+	const handleSubmit = async () => {
 
 		// check name 
 	    if (fields.mingzi == '' && fields.name == ''){
@@ -40,7 +39,8 @@ export default function ContactForm() {
 	    	setFormError("Please enter a zip code")
 	    } else {
 	      setFormError("Form successfully submitted! If you do not receive a confirmation within 5 minutes, please check your spam folder")
-	      // handleFieldChange({target:{id:"mingzi", value:""}})
+           resetFields(emptyFormFields)
+           setFormSuccess(true)
 
 	      emailjs.send(
 	      'service_whisperwindowllc', // service ID 
@@ -85,7 +85,8 @@ export default function ContactForm() {
           			id="mingzi" value={fields.mingzi}
           			onChange={handleFieldChange}
           		/>
-          	</div>
+                    <input className="hidden" id="name" value={fields.name} onChange={handleFieldChange}/>
+               </div>
           	<div className="py-2">
           		EMAIL
           		<input className="
@@ -96,6 +97,7 @@ export default function ContactForm() {
           			id="youjian" value={fields.youjian}
           			onChange={handleFieldChange}
           		/>
+                    <input className="hidden" id="email" value={fields.email} onChange={handleFieldChange}/>
           	</div>
           	<div className="">
           		<div className="pt-2 pb-4 float-left w-2/3">
@@ -123,8 +125,7 @@ export default function ContactForm() {
 		        </div>
 		    </div>
           	<div className="py-2">
-          		ADD A NOTE FOR US (OPTIONAL)
-          		
+          		# WINDOWS & APPROXIMATE DIMENSIONS
           		<textarea className="
           			w-full p-2 pb-1 
           			bg-opacity-0 bg-white
@@ -135,17 +136,23 @@ export default function ContactForm() {
           		/>
           	</div>
           	<div className="py-2">
-          		WHAT'S THE EASIEST WAY TO REACH YOU?
+          		WHAT'S THE BEST WAY TO REACH YOU?
           		<select 
           			id="preferred_contact_method" 
           			onChange={handleFieldChange} 
           			className="block pt-2 pb-0 px-0 w-full text-sm text-brown-500 bg-transparent border-0 border-b-[0.5px] border-brown-700 appearance-none dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer">
-          			<option id="call">Call</option>
+          			<option selected disabled>Please Select</option>
+                         <option id="call">Call</option>
           			<option id="text">Text</option>
           			<option id="email">Email</option>
           		</select>
           	</div>
-          	<div>
+          	<div className={" " + (formSuccess ? 
+                    "text-lime-800 text-md italic font-semibold" 
+                    :
+                    "text-orange-700 text-lg italic font-semibold"
+               )}>
+                    <br/>
           		{formError}
           	</div>
           	<button 

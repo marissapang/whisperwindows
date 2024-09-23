@@ -8,14 +8,13 @@ export function useFormFields(initialState) {
   return [
     fields,
     function(event) {
-      console.log("event.target.id")
-      console.log(event.target.id)
-      console.log("event.target.value")
-      console.log(event.target.value)
       setValues({
         ...fields,
         [event.target.id]: event.target.value
       });
+    },
+    function(empty_values){
+      setValues(empty_values)
     }
   ];
 }
