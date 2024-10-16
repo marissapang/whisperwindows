@@ -1,13 +1,22 @@
+"use client";
 import Image from "next/image";
-import NavBar from "./components/navBar";
+import NavBar from "./components/NavBar";
 import IconWithLabel from "./components/IconWithLabel";
 import HomepageTile from "./components/HomepageTile";
 import ContactForm from "./components/ContactForm";
+import Head from 'next/head';
 
 export default function Home() {
   
   return (
     <main className="font-mukta text-brown-900">
+      <Head>
+        <title>Window Soundproofing NYC | Noise-Reduction For Homes & Offices</title>
+        <meta property="og:title" content="Window Soundproofing NYC | Noise-Reduction For Homes & Offices" key="title" />
+        <meta property="og:description" content="Discover our effective window soundproofing solutions! Our acoustic panels block noise, cold, draft, dust, and more. Servicing the Greater New York Area & shipping nationwide" key="description" />
+        <meta name="geo.region" content="US-NY" />
+        <meta name="geo.placename" content="New York" />
+      </Head>
       <NavBar/>
       <div className="relative -mt-20 max-w-100vw">
         <div className="">
@@ -45,7 +54,7 @@ export default function Home() {
 
           ">
             <IconWithLabel 
-              label="Blocks UV, dust, draft"
+              label="Blocks UV, Dust, Draft"
               src="/icons/block_wind-white-240px.png" 
               alt="placeholder"
             />
@@ -78,7 +87,7 @@ export default function Home() {
         >
           <p className="my-4 lg:my-8 w-[95%] md:w-[85%]">
             Our scientifically designed panels excel at blocking noise, heat, cold, dust, 
-            and UV — way more than regular window glass
+            and UV — much more than regular window glass
           </p>
           <button className="
             p-2 md:p-4 lg:px-6 rounded-sm
@@ -134,7 +143,7 @@ export default function Home() {
           font-ptserif font-bold 
           text-2xl/tight md:text-4xl/normal lg:text-5xl/tight xl:text-6xl/tight"
         >
-          More Effective, More Aesthetic, Less Work
+          Effective, Aesthetic, Less Work
         </h2>
         <div className="">
           <Image 
@@ -160,24 +169,31 @@ export default function Home() {
           font-ptserif font-bold 
           text-2xl/tight md:text-4xl/normal lg:text-5xl/tight xl:text-6xl/tight"
         >
-          Configure online, get it next week
+          {/*Configure online, get it next week*/}
+          Transparent pricing. 10-day lead time.
         </h2>
         <div className="w-[95%] md:w-[85%]">
           <p className="mt-10 font-bold">
-           Our best pricing is online!
+           {/*Our best pricing is online!*/}
+           See our product pages on pricing for different window sizes.
+           <br/> 
+           Get an exact quote by filling out our contact form.
           </p>
           <p className="mt-2 mb-10 text-base">
-           Go through our online questionnaire to select the product 
+           {/*Go through our online questionnaire to select the product 
            option that works best for you. We provide a full fit and satisfaction 
-           guarantee for all our orders placed online.
+           guarantee for all our orders placed online.*/}
           </p>
-          <button className="
-            p-2 md:p-4 lg:px-6 rounded-sm
-            border-2 border-brown-800 text-brown-800 
-            font-semibold
-            hover:border-brown-600 hover:text-brown-600 hover:drop-shadow-md
-            ">
-            Get a quote now
+          <button 
+            className="
+              p-2 md:p-4 lg:px-6 rounded-sm
+              border-2 border-brown-800 text-brown-800 
+              font-semibold
+              hover:border-brown-600 hover:text-brown-600 hover:drop-shadow-md
+              "
+              onClick={()=>{window.location.replace("#contact-form")}}
+            >
+            Get Quote Now
           </button>
         </div>
       </div>
@@ -191,16 +207,18 @@ export default function Home() {
           font-ptserif font-bold 
           text-2xl/tight md:text-4xl/normal lg:text-5xl/tight xl:text-6xl/tight
         ">
-          A solution so simple, it's even easy for renters
+          Renter's Special: Fast Delivery & Modular Rental Panels
         </h2>
         <p className="my-6">
-          Our process is specifically tailored to meeting the needs of renters.
+          If you're interested in leasing one of 
+          our standard-sized modular panels, let us know in the contact form and we 
+          will send you more information! 
         </p>
-        <button className="
-          bg-brown-950 text-white
-          rounded-full px-3 py-1
-        ">
-          Get the Renter's Speical
+        <button 
+          className="bg-brown-950 text-white rounded-full px-3 py-1"
+          onClick={()=>{window.location.replace("#contact-form")}}
+        >
+          Get Rental Quote
         </button>
       </div>
       <div className="p-6 md:p-14 lg:p-20 xl:p-28">
@@ -262,6 +280,7 @@ export default function Home() {
         </div>
         
       </div>
+      <div id="contact-form"/>
       <ContactForm/>
       
 

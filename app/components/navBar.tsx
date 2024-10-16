@@ -13,6 +13,7 @@ export default function NavBar(){
 	const handleNavClick= (e) => {
 		if (e.target.id !== navSelection){
 			setNavSelection(e.target.id)
+
 		} else {
 			setNavSelection("")
 		}
@@ -55,7 +56,7 @@ export default function NavBar(){
 				}
 			>
 				<div className="font-ptserif text-lg drop-shadow select-none">
-					Whisper Window
+					<a href="/">Whisper Window</a>
 					</div>
 				<div className="hidden md:flex select-none">
 					<div className="pr-8">
@@ -67,20 +68,18 @@ export default function NavBar(){
 							className={(navSelection==="product" ? "absolute":"hidden") + " bg-brown-900 bg-opacity-75 p-4 mt-4 -ml-4 min-w-[250px] leading-8"}
 						>
 							<div className="text-white/80 hover:text-white/100 hover:cursor-pointer">
-								Product Picker
+								<a href="/product/panels/magnetic">
+									Magnetic Panels
+								</a>
 							</div>
 							<div className="text-white/80 hover:text-white/100 hover:cursor-pointer">
-								Magnetic Panels
-							</div>
-							<div className="text-white/80 hover:text-white/100 hover:cursor-pointer">
-								Compression Inserts
-							</div>
-							<div className="text-white/80 hover:text-white/100 hover:cursor-pointer">
-								Blackout & Privacy Add-Ons
+								<a href="/product/panels/compression">
+									Compression Inserts
+								</a>
 							</div>
 						</div>
 					</div>
-					<div className="pr-8">
+					{/*<div className="pr-8">
 						<div id="usecases" onClick={handleNavClick} 
 							className={(navSelection==="usecases"? "text-white/100 underline hover:cursor-pointer" : "text-white/80 hover:text-white/100 hover:cursor-pointer")}>
 							Use Cases
@@ -95,38 +94,40 @@ export default function NavBar(){
 								Temperature Insulation
 							</div>
 						</div>
-					</div>
+					</div>*/}
 					<div className="pr-8">
 						<div id="about" onClick={handleNavClick}
 							className={(navSelection==="about"? "text-white/100 underline hover:cursor-pointer" : "text-white/80 hover:text-white/100 hover:cursor-pointer")}>
-							About
+							<a href="/about">About</a>
 						</div>
 					</div>
 					<div className="pr-8">
 						<div id="resources" onClick={handleNavClick}
 							className={(navSelection==="resources"? "text-white/100 underline hover:cursor-pointer" : "text-white/80 hover:text-white/100 hover:cursor-pointer")}>
-							Resources
+							<a href="/resources">Resources</a>
 						</div>
 					</div>
 				</div>
 				<div className="flex">
-					<div className="
+					{/*<div className="
 						hidden md:block 
 						bg-white/95 text-brown-950 px-2 py-0.5 rounded-3xl
 						hover:bg-white/100 hover:cursor-pointer hover:drop-shadow-md"
 					>
 						Instant Quote
-					</div>
+					</div>*/}
 					<div className="
 						md:block hidden ml-4
 						opacity-90 hover:opacity-100 hover:cursor-pointer
 						"
 					>
+						<a href="/about">
 						<Image
 							src="/icons/phone-white-120px.png" 
 							width={20} height={20}
 							alt="phone icon"
 						/>
+						</a>
 					</div>
 					<div className="md:hidden">
 						<div onClick={()=>{setMobileMenu("block")}} className="hover:cursor-pointer">
@@ -144,7 +145,7 @@ export default function NavBar(){
 				className={mobileMenu +
 				" fixed top-0 left-0 w-full h-[100vh]" +
 				" text-3xl text-brown-800 bg-brown-50 bg-opacity-[.99]" + 
-				" p-4"
+				" p-4 select-none"
 			}>
 				<div className="text-right">
 					<span 
@@ -154,28 +155,54 @@ export default function NavBar(){
 						X
 					</span>
 				</div>
-				<div className="mt-20 hover:cursor-pointer hover:text-brown-600">
-					Product
+				<div className="mt-20">
+					<div 
+						id="product"
+						className={(navSelection==="product" ? 
+							"text-brown-600 hover:cursor-pointer" : 
+							"hover:cursor-pointer hover:text-brown-600"
+						)}
+						onClick={handleNavClick}
+					>
+						Product
+					</div>
+					<div className={(navSelection==="product"? "block text-lg" : "hidden text-lg")}>
+						<div>
+							<a href="/product/panels/magnetic"
+								className="hover:cursor-pointer hover:text-brown-600"
+								onClick={()=>{setMobileMenu("hidden")}}>
+								Magnetic
+							</a>
+						</div>
+						<div>
+							<a href="/product/panels/compression"
+								className="hover:cursor-pointer hover:text-brown-600"
+								onClick={()=>{setMobileMenu("hidden")}}>
+								Compression
+							</a>
+						</div>
+					</div>
 				</div>
+
 				<hr className="mt-4 mb-4 bg-brown-500"/>
-				<div className="hover:cursor-pointer hover:text-brown-600">
+				{/*<div className="hover:cursor-pointer hover:text-brown-600">
 					Use Cases
 				</div>
-				<hr className="mt-4 mb-4 bg-brown-500"/>
+				<hr className="mt-4 mb-4 bg-brown-500"/>*/}
 				<div className="hover:cursor-pointer hover:text-brown-600">
-					About
+					<a href="/about">About</a>
 				</div>
 				<hr className="mt-4 mb-4 bg-brown-500"/>
 				<div className="hover:cursor-pointer hover:text-brown-600">
-					Resources
+					<a href="/resources">Resources</a>
 				</div>
 				<hr className="mt-4 mb-4 bg-brown-500"/>
-				<div className="hover:cursor-pointer hover:text-brown-600">
+				{/*<div className="hover:cursor-pointer hover:text-brown-600">
 					Instant Quote
 				</div>
-				<hr className="mt-4 mb-4 bg-brown-500"/>
+				<hr className="mt-4 mb-4 bg-brown-500"/>*/}
 				<div className="hover:cursor-pointer hover:text-brown-600">
-					Contact
+					<a href="/about">Contact</a>
 				</div>
 			</div>
 

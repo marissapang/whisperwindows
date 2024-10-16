@@ -70,10 +70,16 @@ export default function ContactForm() {
           	pt-20
           ">Request A Quote
           </h1>
+          <h2 className="
+               font-ptserif text-center font-bold text-md
+               pt-8
+          ">
+               Or, call/text us at 929-565-2726
+          </h2>
           <div className="
           	w-[90%] sm:w-[65%] md:w-1/2 lg:w-1/3 mx-auto
           	text-brown-700 font-light text-sm
-          	pt-16 pb-20
+          	pt-12 pb-20
           ">
           	<div className="py-2">
           		NAME
@@ -140,8 +146,9 @@ export default function ContactForm() {
           		<select 
           			id="preferred_contact_method" 
           			onChange={handleFieldChange} 
+                         defaultValue="default"
           			className="block pt-2 pb-0 px-0 w-full text-sm text-brown-500 bg-transparent border-0 border-b-[0.5px] border-brown-700 appearance-none dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer">
-          			<option selected disabled>Please Select</option>
+          			<option id="default">Please Select</option>
                          <option id="call">Call</option>
           			<option id="text">Text</option>
           			<option id="email">Email</option>
