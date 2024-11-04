@@ -293,7 +293,7 @@ export default function Page() {
 		        </div>
 		        <div className="mb-3">
 		        	<span className="font-medium">Recommended distance from existing window panes: </span>
-		        	>6" 
+		        	&gt;6" 
 		        </div>
 		        <div className="mb-3">
 		        	<span className="font-medium">Installation methods: </span>
