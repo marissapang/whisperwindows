@@ -1,4 +1,4 @@
-import NavBar from "../../../components/NavBar";
+import NavBar from "../../../components/NavBar.tsx";
 import ContactForm from "../../../components/ContactForm";
 
 import Image from "next/image";
