@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 
-import { Math } from "mathjs";
+// import { math } from "mathjs";
 import Image from "next/image";
 
 
