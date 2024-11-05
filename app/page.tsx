@@ -105,7 +105,7 @@ export default function Home() {
           <Image
               src="/page_photos/kyra_wql_crop.jpg" 
               width={1000} height={1000}
-              alt="phone icon"
+              alt="magnetic panel demo 1"
               style={{width:"100%", height:"100%"}}
             />
         </div>
@@ -114,7 +114,7 @@ export default function Home() {
             <Image
                 src="/page_photos/ajay_sbs_crop.jpg" 
                 width={1000} height={1000}
-                alt="phone icon"  
+                alt="magnetic panel demo 2" 
                 style={{width:"100%", height:"100%"}}
             />
           </div>
@@ -122,7 +122,7 @@ export default function Home() {
             <Image
                 src="/page_photos/bowen_wql_crop.jpg"
                 width={1000} height={1000}
-                alt="phone icon"
+                alt="magnetic panel demo 3"
                 style={{width:"100%", height:"100%"}}
             />
           </div>
