@@ -11,8 +11,8 @@ export default function NavBar(){
 	const [mobileMenu, setMobileMenu] = useState("hidden")
 
 	const handleNavClick= (e) => {
-		if (e.target.id !== navSelection){
-			setNavSelection(e.target.id)
+		if ((e.target as HTMLInputElement).id !== navSelection){
+			setNavSelection((e.target as HTMLInputElement).id)
 
 		} else {
 			setNavSelection("")
@@ -29,7 +29,7 @@ export default function NavBar(){
 		});
 
 		window.addEventListener('click', (e) => {
-			const id = e.target.id
+			const id = (e.target as HTMLInputElement).id
 			if ((id !== "product") && (id !== "usecases") && (id !== "about") && (id !== "resources")){
 				setNavSelection("")
 			}
