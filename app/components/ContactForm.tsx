@@ -74,7 +74,7 @@ export default function ContactForm() {
                font-ptserif text-center font-bold text-md
                pt-8
           ">
-               Or, call/text us at 929-565-2726
+               Or, call/text us at 646-397-4655
           </h2>
           <div className="
           	w-[90%] sm:w-[65%] md:w-1/2 lg:w-1/3 mx-auto
