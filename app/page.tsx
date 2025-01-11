@@ -46,7 +46,7 @@ export default function Home() {
             text-2xl md:text-4xl/tight lg:text-5xl/tight xl:text-6xl/tight
             lg:max-w-[650px] lg:m-auto
           ">
-            Block out 90% of noise in 7 days
+            Block out 90% of noise in 7 days!
           </h2>
           <div className="
             flex justify-around max-w-[500px] m-0 m-auto
