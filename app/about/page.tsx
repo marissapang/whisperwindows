@@ -38,7 +38,7 @@ export default function Page() {
 						</a>
 					</li>
 					<li className="text-brown-700 hover:underline">
-						<a href="https://www.instagram.com/whisperwindow/" target="_blank">
+						<a href="https://www.instagram.com/whisperwindows/" target="_blank">
 							Instagram
 						</a>
 					</li>
