@@ -16,16 +16,6 @@ export default function Home() {
         <meta property="og:description" content="Discover our effective window soundproofing solutions! Our acoustic panels block noise, cold, draft, dust, and more. Servicing the Greater New York Area & shipping nationwide" key="description" />
         <meta name="geo.region" content="US-NY" />
         <meta name="geo.placename" content="New York" />
-        <!-- Google tag (gtag.js) -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=AW-11557517184">
-        </script>
-        <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-
-          gtag('config', 'AW-11557517184');
-        </script>
       </Head>
       <NavBar/>
       <div className="relative -mt-20 max-w-100vw">
@@ -56,7 +46,7 @@ export default function Home() {
             text-2xl md:text-4xl/tight lg:text-5xl/tight xl:text-6xl/tight
             lg:max-w-[650px] lg:m-auto
           ">
-            Block out 90% of noise in 7 days!
+            Block out 90% of noise in 7 days
           </h2>
           <div className="
             flex justify-around max-w-[500px] m-0 m-auto
