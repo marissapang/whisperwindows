@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import emailjs from '@emailjs/browser';
 import { useFormFields } from '../libs/hooksLib';
+import { sendGTMEvent } from '@next/third-parties/google';
 
 export default function ContactForm() {
 	const [formError, setFormError] = useState(" ")
@@ -41,6 +42,9 @@ export default function ContactForm() {
 	      setFormError("Form successfully submitted! If you do not receive a confirmation within 5 minutes, please check your spam folder")
            resetFields(emptyFormFields)
            setFormSuccess(true)
+           sendGTMEvent({ 'event': 'conversion', 'value': 1.0, 'send_to':'AW-11557517184/L9ReCJ_D74MaEIDvhocr'})
+
+
 
 	      emailjs.send(
 	      'service_whisperwindowllc', // service ID 
@@ -56,6 +60,7 @@ export default function ContactForm() {
 	        console.log(error);
 
 	      });
+
 	    }
 
 	}
