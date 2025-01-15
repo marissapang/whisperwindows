@@ -42,7 +42,7 @@ export default function ContactForm() {
 	      setFormError("Form successfully submitted! If you do not receive a confirmation within 5 minutes, please check your spam folder")
            resetFields(emptyFormFields)
            setFormSuccess(true)
-           sendGTMEvent({ 'event': 'conversion', 'value': 1.0, 'send_to':'AW-11557517184/L9ReCJ_D74MaEIDvhocr'})
+           sendGTMEvent({ 'event': 'conversion', 'value': 1.0, 'send_to':'L9ReCJ_D74MaEIDvhocr'})
 
 
 
