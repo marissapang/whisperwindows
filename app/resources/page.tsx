@@ -7,7 +7,7 @@ export default function Page() {
 	return (
 		<div className="font-mukta text-brown-900">
 			<Head>
-		        <title>DIY Soundproofing Tips | Free Resources for Noise Reductio</title>
+		        <title>DIY Soundproofing Tips | Free Resources for Noise Reduction</title>
 		        <meta property="og:title" content="DIY Soundproofing Tips | Free Resources for Noise Reductio" key="title" />
 		        <meta property="og:description" content="Explore our free soundproofing resources and DIY noise-reduction tips. Learn simple, effective ways to reduce noise at home with expert guidance." key="description" />
 

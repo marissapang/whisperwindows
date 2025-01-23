@@ -1,3 +1,20 @@
 {
-  "pages": {}
+  "pages": {
+    "/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/layout.css",
+      "static/chunks/app/layout.js"
+    ],
+    "/resources/gallery/soundproofing-and-insulation-for-black-floor-to-ceiling-windows/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/resources/gallery/soundproofing-and-insulation-for-black-floor-to-ceiling-windows/page.js"
+    ],
+    "/resources/gallery/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/resources/gallery/layout.js"
+    ]
+  }
 }
