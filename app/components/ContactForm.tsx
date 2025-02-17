@@ -3,8 +3,7 @@
 import { useState, useRef } from 'react';
 import emailjs from '@emailjs/browser';
 import { useFormFields } from '../libs/hooksLib';
-import { sendGTMEvent } from '@next/third-parties/google';
-import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google'
+import { sendGTMEvent, GoogleTagManager } from '@next/third-parties/google'
 
 
 export default function ContactForm() {
@@ -45,8 +44,6 @@ export default function ContactForm() {
            resetFields(emptyFormFields)
            setFormSuccess(true)
 
-           <GoogleAnalytics gaId="G-DFV12L0CYM" />
-           <GoogleAnalytics gaId="GT-PZX4BHX7"  />
            <GoogleTagManager gtmId="AW-11557517184" />
            sendGTMEvent({ 'event': 'conversion', 'value': 1.0, 'send_to':'AW-11557517184/L9ReCJ_D74MaEIDvhocr'})
            sendGTMEvent({ event: 'conversion', value: {'send_to':'AW-11557517184/L9ReCJ_D74MaEIDvhocr', 'value':1.0}})
