@@ -4,6 +4,8 @@ import { useState, useRef } from 'react';
 import emailjs from '@emailjs/browser';
 import { useFormFields } from '../libs/hooksLib';
 import { sendGTMEvent } from '@next/third-parties/google';
+import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google'
+
 
 export default function ContactForm() {
 	const [formError, setFormError] = useState(" ")
@@ -42,6 +44,10 @@ export default function ContactForm() {
 	      setFormError("Form successfully submitted! If you do not receive a confirmation within 5 minutes, please check your spam folder")
            resetFields(emptyFormFields)
            setFormSuccess(true)
+
+           <GoogleAnalytics gaId="G-DFV12L0CYM" />
+           <GoogleAnalytics gaId="GT-PZX4BHX7"  />
+           <GoogleTagManager gtmId="AW-11557517184" />
            sendGTMEvent({ 'event': 'conversion', 'value': 1.0, 'send_to':'AW-11557517184/L9ReCJ_D74MaEIDvhocr'})
            sendGTMEvent({ event: 'conversion', value: {'send_to':'AW-11557517184/L9ReCJ_D74MaEIDvhocr', 'value':1.0}})
            sendGTMEvent({ event: 'conversion', value: {'send_to':'L9ReCJ_D74MaEIDvhocr', 'value':1.0}})
