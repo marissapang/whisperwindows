@@ -21,8 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>{children}</body>
       <GoogleAnalytics gaId="G-DFV12L0CYM" />
-      {/*<GoogleAnalytics gaId="GT-PZX4BHX7"  />*/}
-      {<GoogleTagManager gtmId="GT-WP5MC8DD />}
+      <GoogleTagManager gtmId="GT-WP5MC8DD" />
     </html>
   );
 }
