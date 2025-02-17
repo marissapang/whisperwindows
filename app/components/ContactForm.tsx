@@ -44,12 +44,14 @@ export default function ContactForm() {
            resetFields(emptyFormFields)
            setFormSuccess(true)
 
-           <GoogleTagManager gtmId="AW-11557517184" />
-           sendGTMEvent({ 'event': 'conversion', 'value': 1.0, 'send_to':'AW-11557517184/L9ReCJ_D74MaEIDvhocr'})
-           sendGTMEvent({ event: 'conversion', value: {'send_to':'AW-11557517184/L9ReCJ_D74MaEIDvhocr', 'value':1.0}})
+           sendGTMEvent({ 'event': 'conversion', 'value': 1.0, 'send_to':'L9ReCJ_D74MaEIDvhocr'})
            sendGTMEvent({ event: 'conversion', value: {'send_to':'L9ReCJ_D74MaEIDvhocr', 'value':1.0}})
-           sendGTMEvent({ event: 'submit_interest_form', value: {'send_to':'AW-11557517184/L9ReCJ_D74MaEIDvhocr'}})
            sendGTMEvent({ event: 'submit_interest_form', value: {'send_to':'L9ReCJ_D74MaEIDvhocr'}})
+           sendGTMEvent({ event: 'submit_interest_form', value: 1.0})
+           sendGTMEvent({ event: 'conversion', value: 1.0})
+
+           
+
 
 	      emailjs.send(
 	      'service_whisperwindowllc', // service ID 
