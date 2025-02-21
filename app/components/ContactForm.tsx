@@ -3,7 +3,6 @@
 import { useState, useRef } from 'react';
 import emailjs from '@emailjs/browser';
 import { useFormFields } from '../libs/hooksLib';
-import { sendGTMEvent, GoogleTagManager } from '@next/third-parties/google'
 
 
 export default function ContactForm() {
@@ -44,14 +43,7 @@ export default function ContactForm() {
            resetFields(emptyFormFields)
            setFormSuccess(true)
 
-           sendGTMEvent({ 'event': 'conversion', 'value': 1.0, 'send_to':'L9ReCJ_D74MaEIDvhocr'})
-           sendGTMEvent({ event: 'conversion', value: {'send_to':'L9ReCJ_D74MaEIDvhocr', 'value':1.0}})
-           sendGTMEvent({ event: 'submit_interest_form', value: {'send_to':'L9ReCJ_D74MaEIDvhocr'}})
-           sendGTMEvent({ event: 'submit_interest_form', value: 1.0})
-           sendGTMEvent({ event: 'conversion', value: 1.0})
-
            
-
 
 	      emailjs.send(
 	      'service_whisperwindowllc', // service ID 
@@ -61,14 +53,17 @@ export default function ContactForm() {
 	      )
 	      .then((results)=>{
 	      	console.log("seeing results!")
-	        console.log(results);
+	          console.log(results);
+               window.open("/interest-form-success", "Success","width=400,height=400,toolbar=0,menubar=0")
 	      },(error)=>{
 	      	console.log("there is an error...")
-	        console.log(error);
-
+	          console.log(error);
 	      });
 
+           window.open("/interest-form-success", "Success","width=400,height=400,toolbar=0,menubar=0")
+
 	    }
+
 
 	}
 
@@ -183,6 +178,8 @@ export default function ContactForm() {
           	>
           		SUBMIT
           	</button>
+
+
           </div>
 		</div>
 	)
