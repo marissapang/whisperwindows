@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from 'react';
-import { useRouter } from 'next/navigation'
+import { useRouter, redirect } from 'next/navigation'
 import emailjs from '@emailjs/browser';
 import { useFormFields } from '../libs/hooksLib';
 
@@ -55,15 +55,15 @@ export default function ContactForm() {
 	      .then((results)=>{
 	      	console.log("seeing results!")
 	          console.log(results);
-               window.open("/interest-form-success", "Success","width=400,height=400,toolbar=0,menubar=0")
+               // const router = useRouter()
+               // router.push('/interest-form-success')
+               redirect('/interest-form-success')
 	      },(error)=>{
 	      	console.log("there is an error...")
 	          console.log(error);
 	      });
 
-           // window.open("/interest-form-success", "Success","width=400,height=400,toolbar=0,menubar=0")
-           const router = useRouter()
-           router.push('/interest-form-success')
+           
 	    }
 
 
