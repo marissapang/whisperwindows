@@ -5,7 +5,7 @@ import Head from 'next/head';
 
 export default function Page() {
 	return (
-		<div className="font-mukta text-brown-900">
+		<div className="font-mukta text-brown-900 bg-white">
 			<Head>
 		        <title>About Us | Window Soundproofing Experts in NYC & Tri-State Area</title>
 		        <meta property="og:title" content="About Us | Window Soundproofing Experts in NYC & Tri-State Area" key="title" />

@@ -7,7 +7,7 @@ import Head from 'next/head';
 
 export default function Page() {
 	return (
-		<div className="font-mukta text-brown-900">
+		<div className="font-mukta text-brown-900 bg-white">
             <Head>
                 <title>WhisperQuiet Magnetic Panel | Modular Soundproofing for Every Window</title>
                 <meta property="og:title" content="WhisperQuiet Magnetic Panel | Modular Soundproofing for Every Window" key="title" />
