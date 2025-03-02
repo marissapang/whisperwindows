@@ -9,7 +9,7 @@ import Head from 'next/head';
 export default function Home() {
   
   return (
-    <main className="font-mukta text-brown-900">
+    <main className="font-mukta text-brown-900 bg-white">
       <Head>
         <title>Window Soundproofing NYC | Noise-Reduction For Homes & Offices</title>
         <meta property="og:title" content="Window Soundproofing NYC | Noise-Reduction For Homes & Offices" key="title" />
