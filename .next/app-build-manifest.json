@@ -6,6 +6,26 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
+    "/dev/Mg2PcSs/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/dev/Mg2PcSs/page.js"
+    ],
+    "/dev/MVP/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/dev/MVP/page.js"
+    ],
+    "/api/orders/get/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/orders/get/route.js"
+    ],
+    "/api/orders/create/route": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/api/orders/create/route.js"
+    ],
     "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
