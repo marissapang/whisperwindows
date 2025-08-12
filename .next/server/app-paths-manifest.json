@@ -1,5 +1,5 @@
 {
-  "/dev/Mg2PcSs/page": "app/dev/Mg2PcSs/page.js",
-  "/page": "app/page.js",
+  "/api/orders/create/route": "app/api/orders/create/route.js",
+  "/api/orders/get/route": "app/api/orders/get/route.js",
   "/dev/MVP/page": "app/dev/MVP/page.js"
 }

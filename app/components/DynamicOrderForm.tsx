@@ -1,23 +1,46 @@
 'use client';
 
-// import { updateNestedField } from '@/app/utils/updateHelpers'; // You'll define this
 import { useState } from 'react';
+import { fieldComponentMap } from './fields';
+
 
 export function DynamicOrderForm({
 	order,
 	orderMeta,
 	setOrder,
+	view,
 }: {
 	order: any;
 	orderMeta: any;
 	setOrder: (o: any) => void;
+	view: 'Client' | 'Sales' | 'Manufacturer' | 'Installer';
 }) {
 
 	const [status, setStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
+	// 🔄 Utility: filter out group-only layers from path
+  const pruneMetaPath = (meta: any, fullPath: string): string => {
+    const keys = fullPath.split('.');
+    const truePath: string[] = [];
+    let cursorMeta = meta;
+
+    for (const key of keys) {
+      const field = cursorMeta?.[key];
+      if (!field) break;
+
+      if (field.type !== 'group') {
+        truePath.push(key);
+      }
+
+      cursorMeta = field.fields || {};
+    }
+
+    return truePath.join('.');
+  };
 
 	const updateNestedField = (obj: any, path: string, value: any) => {
-		const keys = path.split('.');
+		const realPath = pruneMetaPath(orderMeta, path);
+		const keys = realPath.split('.');
 		const updated = { ...obj };
 		let cursor: any = updated;
 
@@ -42,23 +65,47 @@ export function DynamicOrderForm({
 		return updated;
 	};
 
-	const update = (path: string, value: any) => {
-		setOrder((prev: any) => updateNestedField(prev, path, value));
-	};
-
-	function formatInches(value: number): string {
-		return value.toFixed(4); // Display up to 1/16" (0.0625)
-	}
-
-	function parseInchesInput(value: string): number {
-		const parsed = parseFloat(value);
-		return isNaN(parsed) ? 0 : Math.round(parsed * 16) / 16;
-	}
-
 	function getValueByPath(obj: any, path: string): any {
-		return path.split('.').reduce((o, k) => (o ? o[k] : undefined), obj);
+		const realPath = pruneMetaPath(orderMeta, path);
+		return realPath.split('.').reduce((o, k) => (o ? o[k] : undefined), obj);
 	}
 
+	function getMetaAtPath(meta: any, path: string): any {
+	  const keys = path.split('.');
+	  return keys.reduce((acc, key, idx) => {
+	    if (!acc) return undefined;
+
+	    const isLast = idx === keys.length - 1;
+
+	    // Only descend into .fields if it's not the last segment
+	    return isLast ? acc[key] : acc[key]?.fields ?? acc[key];
+	  }, meta);
+	}
+
+	function resolvePermissions(
+	  metaPath: string,
+	  metaRoot: any
+	): {
+	  visibleTo: string[];
+	  editableBy: string[];
+	  readOnlyStages: string[];
+	} {
+	  const keys = metaPath.split('.');
+
+	  for (let j = keys.length; j > 0; j--) {
+	    const subPath = keys.slice(0, j).join('.');
+	    const node = getMetaAtPath(metaRoot, subPath);
+	    if (node?.fields_permissions) {
+	      return {
+	        visibleTo: node.fields_permissions.visibleTo ?? [],
+	        editableBy: node.fields_permissions.editableBy ?? [],
+	        readOnlyStages: node.fields_permissions.readOnlyStages ?? [],
+	      };
+	    }
+	  }
+
+  return { visibleTo: [], editableBy: [], readOnlyStages: [] };
+}
 
   const handleSave = async () => {
     setStatus('saving');
@@ -86,104 +133,84 @@ export function DynamicOrderForm({
 
 	// recursively calls on itself to read and render nested fields 
 	const renderFields = (
-		data: any,
-		meta: any,
-		onChange: (path: string, value: any) => void,
-		parentPath = '',
-		indentLevel = 0
-		): JSX.Element[] => {
-		const fields: JSX.Element[] = [];
+    data: any,
+    meta: any,
+    onChange: (path: string, value: any) => void,
+    parentPath = '',
+    indentLevel = 0
+  ): JSX.Element[] => {
+    const fields: JSX.Element[] = [];
 
-		console.log("inside render Fields function, the meta is ")
-		console.log(meta)
-		console.log("Object.entries(meta)")
-		console.log(Object.entries(meta))
-		for (const [key, config] of Object.entries(meta)) {
-			console.log(`inside for loop, key is`)
-			console.log(key)
-			console.log(" and config is") 
-			console.log(config)
+    for (const [key, config] of Object.entries(meta)) {
+      const fullPath = parentPath ? `${parentPath}.${key}` : key;
+      const padding = "pl-0"//`pl-${Math.min(indentLevel * 4, 12)}`;
+      const value = getValueByPath(data, fullPath);
 
-			if (config?.omit){
-				continue;
-			} else {
-				console.log("did not skipped config")
-			}
-
-			const fullPath = parentPath ? `${parentPath}.${key}` : key;
-			console.log("data here is")
-			console.log(data)
-			const value = getValueByPath(data, fullPath);
-
-			console.log("fullPath is")
-			console.log(fullPath)
-			console.log("value is")
-			console.log(value)
-
-			const padding = `pl-${Math.min(indentLevel * 4, 12)}`; // Tailwind padding: pl-0 → pl-12
-
-			if (config.type === 'group') {
-      fields.push(
-        <div key={fullPath} className={`mt-4 mb-2 ${padding}`}>
-          <div className="font-semibold text-gray-700 mb-1">
-            {config.label || key.replace(/_/g, ' ')}
+      if (config.type === 'group') {
+        fields.push(
+          <div key={fullPath} className={`mt-4 mb-2 ${padding}`}>
+            <div className={config.style}>
+              {config.label || key.replace(/_/g, ' ')}
+            </div>
+            {renderFields(data, config.fields, onChange, fullPath, indentLevel + 1)}
           </div>
-          {renderFields(
-            data || {},
-            config.fields,
-            onChange,
-            fullPath,
-            indentLevel + 1
-          )}
+        );
+        continue;
+      }
+
+      if (config.type === 'nested_object') {
+        fields.push(
+          <div key={fullPath} className={`mt-4 mb-2 ${padding}`}>
+            <div className="font-semibold text-gray-600 mb-1 text-lg">
+              {config.label || key}
+            </div>
+            {renderFields(data, config.fields, onChange, fullPath, indentLevel + 1)}
+          </div>
+        );
+        continue;
+      }
+
+      const perms = resolvePermissions(fullPath, orderMeta);
+      if (!perms.visibleTo.includes(view)){
+      	continue;
+      } 
+
+
+
+      const editable = perms.editableBy.includes(view) && !perms.readOnlyStages.includes(order.Order_Status);
+      const label = config.label || key;
+      const type = config.type;
+
+      console.log(`field is: ${key}`)
+      console.log(perms)
+      console.log(editable)
+
+      const FieldComponent = fieldComponentMap[type];
+
+      if (!FieldComponent) {
+        console.warn(`No field component registered for type: ${type}`);
+        continue;
+      }
+
+      fields.push(
+        <div key={`wrapper-${fullPath}`} className={padding}>
+          <FieldComponent
+            value={value}
+            editable={editable}
+            label={label}
+            onChange={(v: any) => {
+              const updated = updateNestedField(order, fullPath, v);
+              setOrder(updated);
+            }}
+          />
         </div>
       );
-      continue;
+
+
     }
 
-    // ✅ Base-level input field
-    const label = config.label || key;
-    const type = config.type;
-
-    const inputProps = {
-      className: `w-full p-2 border rounded mb-3 ${padding}`,
-      value: type === 'number_inches' ? formatInches(value ?? 0) : value ?? '',
-      onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const raw = e.target.value;
-        const parsed =
-          type === 'number_inches'
-            ? parseInchesInput(raw)
-            : type === 'number'
-            ? parseFloat(raw)
-            : raw;
-
-        // onChange(fullPath, parsed);
-        const updated = updateNestedField(order, fullPath, parsed);
-  			setOrder(updated); // ✅ Direct update with fresh object
-      },
-    };
-
-    fields.push(
-      <div key={`wrapper-${fullPath}`} className={padding}>
-        <label className="block font-medium text-sm text-gray-700 mb-1">
-          {label}
-        </label>
-        {type === 'longtext' ? (
-          <textarea key={fullPath} rows={4} {...inputProps} />
-        ) : (
-          <input
-            key={fullPath}
-            {...inputProps}
-            type={type === 'number_inches' || type === 'number' ? 'number' : 'text'}
-            step={type === 'number_inches' ? 1 / 16 : 'any'}
-          />
-        )}
-      </div>
-    );
-
-		}
-
-		return fields;
-	};
+    return fields;
+  };
 
 	return (
 		<div>

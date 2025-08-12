@@ -73,8 +73,6 @@ export default function MVP() {
 };
 
 
-
-
   return (
     <div className="p-4">
     	<h1>Get Order</h1>
@@ -94,7 +92,11 @@ export default function MVP() {
 
 	        {order && (
 	        	<div className='block w-100'>
-        			<DynamicOrderForm order={order} orderMeta={orderMeta} setOrder={setOrder} />
+        			<DynamicOrderForm 
+        				order={order} 
+        				orderMeta={orderMeta} 
+        				setOrder={setOrder}
+        				view="Client" />
         		</div>
       		)}
       </div>
