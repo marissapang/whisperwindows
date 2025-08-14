@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { fieldComponentMap } from './fields';
+import { createSingleOrDoubleHungWindow } from '@/app/schemas/createSingleOrDoubleHungWindow';
 
 
 export function DynamicOrderForm({
@@ -145,26 +146,62 @@ export function DynamicOrderForm({
       const fullPath = parentPath ? `${parentPath}.${key}` : key;
       const padding = "pl-0"//`pl-${Math.min(indentLevel * 4, 12)}`;
       const value = getValueByPath(data, fullPath);
+      
+      // Type assertion for config to fix TypeScript errors
+      const fieldConfig = config as any;
 
-      if (config.type === 'group') {
+      if (fieldConfig.type === 'group') {
         fields.push(
           <div key={fullPath} className={`mt-4 mb-2 ${padding}`}>
-            <div className={config.style}>
-              {config.label || key.replace(/_/g, ' ')}
+            <div className={fieldConfig.style}>
+              {fieldConfig.label || key.replace(/_/g, ' ')}
             </div>
-            {renderFields(data, config.fields, onChange, fullPath, indentLevel + 1)}
+            {renderFields(data, fieldConfig.fields, onChange, fullPath, indentLevel + 1)}
           </div>
         );
         continue;
       }
 
-      if (config.type === 'nested_object') {
+      if (fieldConfig.type === 'nested_object') {
         fields.push(
           <div key={fullPath} className={`mt-4 mb-2 ${padding}`}>
             <div className="font-semibold text-gray-600 mb-1 text-lg">
-              {config.label || key}
+              {fieldConfig.label || key}
             </div>
-            {renderFields(data, config.fields, onChange, fullPath, indentLevel + 1)}
+            {renderFields(data, fieldConfig.fields, onChange, fullPath, indentLevel + 1)}
+          </div>
+        );
+        continue;
+      }
+
+      if (fieldConfig.type === 'array') {
+        const perms = resolvePermissions(fullPath, orderMeta);
+        if (!perms.visibleTo.includes(view)) {
+          continue;
+        }
+        
+        const editable = perms.editableBy.includes(view) && !perms.readOnlyStages.includes(order.Order_Status);
+        
+        // Determine the create function based on the array content
+        let createNewItem = () => ({});
+        if (key === 'Windows' && fieldConfig.itemMeta) {
+          createNewItem = createSingleOrDoubleHungWindow;
+        }
+        
+        const ArrayFieldComponent = fieldComponentMap['array'];
+        fields.push(
+          <div key={fullPath} className={`mt-4 mb-2 ${padding}`}>
+            <ArrayFieldComponent
+              value={value || []}
+              editable={editable}
+              label={fieldConfig.label || key}
+              itemMeta={fieldConfig.itemMeta}
+              createNewItem={createNewItem}
+              onChange={(newArray: any[]) => {
+                const updated = updateNestedField(order, fullPath, newArray);
+                setOrder(updated);
+              }}
+            />
           </div>
         );
         continue;
@@ -178,8 +215,8 @@ export function DynamicOrderForm({
 
 
       const editable = perms.editableBy.includes(view) && !perms.readOnlyStages.includes(order.Order_Status);
-      const label = config.label || key;
-      const type = config.type;
+      const label = fieldConfig.label || key;
+      const type = fieldConfig.type;
 
       console.log(`field is: ${key}`)
       console.log(perms)
