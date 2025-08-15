@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { fieldComponentMap } from './index';
+import { WindowMeasurementInterface } from './WindowMeasurementInterface';
 
 interface ArrayFieldProps {
   value: any[];
@@ -66,24 +67,41 @@ export function ArrayField({
     });
   };
 
-  const renderItemField = (item: any, itemIndex: number, fieldKey: string, fieldConfig: any) => {
-    const FieldComponent = fieldComponentMap[fieldConfig.type];
+  const renderItemFields = (item: any, index: number) => {
+    const fields: JSX.Element[] = [];
     
-    if (!FieldComponent) {
-      console.warn(`No field component for type: ${fieldConfig.type}`);
-      return null;
-    }
-
-    return (
-      <div key={`${itemIndex}-${fieldKey}`} className="mb-2">
-        <FieldComponent
-          value={item[fieldKey]}
+    // Check if this is a window item and use the special interface
+    if (item.Window_Type === 'Single/Double Hung Window' || label.toLowerCase().includes('window')) {
+      return (
+        <WindowMeasurementInterface
+          value={item}
           editable={editable}
-          label={fieldConfig.label || fieldKey}
-          onChange={(newValue: any) => updateItem(itemIndex, fieldKey, newValue)}
+          onChange={(field: string, newValue: any) => updateItem(index, field, newValue)}
+          itemMeta={itemMeta}
         />
-      </div>
-    );
+      );
+    }
+    
+    // Default rendering for non-window items
+    for (const [key, config] of Object.entries(itemMeta)) {
+      const fieldConfig = config as any;
+      const FieldComponent = fieldComponentMap[fieldConfig.type];
+      
+      if (!FieldComponent) continue;
+      
+      fields.push(
+        <div key={key} className="mb-3">
+          <FieldComponent
+            value={item[key]}
+            editable={editable}
+            label={fieldConfig.label || key}
+            onChange={(newValue: any) => updateItem(index, key, newValue)}
+          />
+        </div>
+      );
+    }
+    
+    return <div className="space-y-3">{fields}</div>;
   };
 
   return (
@@ -131,11 +149,7 @@ export function ArrayField({
               </div>
               
               {expandedItems.has(index) && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-                  {Object.entries(itemMeta).map(([fieldKey, fieldConfig]: [string, any]) => 
-                    renderItemField(item, index, fieldKey, fieldConfig)
-                  )}
-                </div>
+                renderItemFields(item, index)
               )}
             </div>
           ))}
