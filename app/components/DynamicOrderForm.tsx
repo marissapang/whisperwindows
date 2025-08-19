@@ -235,6 +235,7 @@ export function DynamicOrderForm({
             value={value}
             editable={editable}
             label={label}
+            options={fieldConfig.options}
             onChange={(v: any) => {
               const updated = updateNestedField(order, fullPath, v);
               setOrder(updated);
