@@ -1,4 +1,5 @@
 import { customAlphabet } from 'nanoid';
+import { createSingleOrDoubleHungWindow, singleOrDoubleHungWindowMeta } from './createSingleOrDoubleHungWindow';
 
 // helper fun functions
 function generateOrderId(n=6){
@@ -108,7 +109,8 @@ export const createBlankOrder = () => ({
 	Order_Status: "created",
 	Delivery_Address: generateEmptyAddress(),
 	Delivery_Contact_Name: "",
-	Window_Width: null
+	Window_Width: null,
+	Windows: [] // Collection of window objects with ordering
 }) 
 
 export const orderMeta = {
@@ -204,6 +206,23 @@ export const orderMeta = {
 			Window_Width: {
 				'type': 'number_inches',
 				'label': 'Window Width'
+			}
+		}
+	},
+	Windows: {
+		type: "group",
+		label: "WINDOWS",
+		style: styles.Group_Header_L1,
+		fields_permissions: {
+			'visibleTo': permissions.all,
+			'editableBy': permissions.all,
+			'readOnlyStages': orderStages.none
+		},
+		fields: {
+			Windows: {
+				'type': 'array',
+				'label': 'Window Collection',
+				'itemMeta': singleOrDoubleHungWindowMeta
 			}
 		}
 	}
