@@ -35,23 +35,19 @@ const addressMeta = {
 // // extension functions
 // //-----------------------------------------
 
-// function generateEmptyExtension(){
-// 	return {
-// 	  Extension: true,
-// 	  Depth: 0,
-// 	  Type: 'interior',
-// 	  Support_Notes: '',
-// 	  General_Notes: ''
-// 	}
-// }
+function generateEmptyExtension(){
+	return {
+	  Extension: true,
+	  Configuration: "",
+	  Material: "",
+	  Bottom_Material_Override: "",
+	  Type: 'interior',
+	  Support_Notes: '',
+	  General_Notes: ''
+	}
+}
 
-// const extensionMeta = {
-//   Extension: {'type':'bool', 'label': "Frame Extension?", 'omit':false},
-//   Depth: {'type':'number_inches', 'label': "Extension Depth", 'omit':false},
-//   Type: {'type':'string', 'label': "Extension Type", 'omit':false},
-//   Support_Notes: {'type':'longtext', 'label': "Frame Support Notes", 'omit':true},
-//   General_Notes: {'type':'longtext', 'label': "General Notes", 'omit':false},
-// }
+
 
 
 // //-----------------------------------------
@@ -105,9 +101,23 @@ const orderStages = {
 export const createBlankOrder = () => ({
 	Order_Id: generateOrderId(),
 	Client_Name: "",
+	Invoice_Number: "",
 	Order_Created_Date: new Date().toISOString().split('T')[0],
 	Order_Submitted_date: null,
 	Order_Status: "created",
+	Status: "Pre-Install",
+	Next_Steps: "",
+	Deposit_Date: null,
+	Order_Details: "",
+	Frame_Notes: "",
+	Blinds_Notes: "",
+	Payment_Stage: "Waiting on Deposit",
+	QBO_Stage: "Estimate",
+	Check_Config: "Not Started",
+	Install_Stage: "Not Started",
+	MFG_Stage: "Not Started",
+	COI_Stage: "Not Started",
+	COI_Link: "",
 	Delivery_Address: generateEmptyAddress(),
 	Delivery_Contact_Name: "",
 	Window_Width: null,
@@ -138,6 +148,15 @@ export const orderMeta = {
 				},	
 				'readOnlyStages': orderStages.post_sales_review
 			},
+			Invoice_Number: {
+				'type': 'string',
+				'label': 'Invoice #',
+				fields_permissions: {
+					'visibleTo': permissions.all,
+					'editableBy': permissions.all,
+				},	
+				'readOnlyStages': orderStages.none
+			},
 			Order_Created_Date: {
 				'type': 'string',
 				'label': "Order Created",
@@ -151,6 +170,89 @@ export const orderMeta = {
 				'label': 'Order Status',
 			}
 		},
+	},
+	Order_Management: {
+		type: "group",
+		label: "ORDER MANAGEMENT",
+		style: styles.Group_Header_L1,
+		fields_permissions: {
+			'visibleTo': permissions.all,
+			'editableBy': permissions.all,
+			'readOnlyStages': orderStages.none
+		},
+		fields: {
+			Status: {
+				'type': 'select',
+				'label': 'Status',
+				'options': ['Pre-Install', 'Installing', 'Post-Install', 'Finished', 'Waiting for Blinds']
+			},
+			Next_Steps: {
+				'type': 'longtext',
+				'label': 'Next Steps'
+			},
+			Deposit_Date: {
+				'type': 'date',
+				'label': 'Deposit Date'
+			},
+			Order_Details: {
+				'type': 'longtext',
+				'label': 'Order Details'
+			},
+			Frame_Notes: {
+				'type': 'longtext',
+				'label': 'Frame Notes'
+			},
+			Blinds_Notes: {
+				'type': 'longtext',
+				'label': 'Blinds Notes'
+			}
+		}
+	},
+	Process_Tracking: {
+		type: "group",
+		label: "PROCESS TRACKING",
+		style: styles.Group_Header_L1,
+		fields_permissions: {
+			'visibleTo': permissions.all,
+			'editableBy': permissions.all,
+			'readOnlyStages': orderStages.none
+		},
+		fields: {
+			Payment_Stage: {
+				'type': 'select',
+				'label': 'Payment Stage',
+				'options': ['Waiting on Deposit', 'Partial Deposit', 'Full Deposit', 'Partial Final Payment', 'Full Payment']
+			},
+			QBO_Stage: {
+				'type': 'select',
+				'label': 'QBO Stage',
+				'options': ['Estimate', 'Invoice', 'Deposit Confirmation', 'Full Payment Confirmation']
+			},
+			Check_Config: {
+				'type': 'select',
+				'label': 'Check Config',
+				'options': ['Not Started', 'Not Needed', 'Waiting for Sample', 'Sample Received', 'Waiting on Heather', 'COI Received', 'Waiting on Building', 'COI Approved']
+			},
+			Install_Stage: {
+				'type': 'select',
+				'label': 'Install Stage',
+				'options': ['Not Started', 'Started', 'Frame Done', 'Panel Done', 'Shades Done', 'Misc Tasks Done', 'Fully Completed']
+			},
+			MFG_Stage: {
+				'type': 'select',
+				'label': 'MFG Stage',
+				'options': ['Not Started', 'Started', 'Frame Complete', 'Panels Complete', 'Waiting for Shades', 'Shades Arrived', 'Misc Items Prepped', 'Packed']
+			},
+			COI_Stage: {
+				'type': 'select',
+				'label': 'COI Stage',
+				'options': ['Not Started', 'Not Needed', 'Waiting for Sample', 'Sample Recieved', 'Waiting on Heather', 'COI Received', 'Waiting on Building', 'COI approved']
+			},
+			COI_Link: {
+				'type': 'string',
+				'label': 'COI Link'
+			}
+		}
 	}, 
 	Delivery_Info: {
 		type: "group",
