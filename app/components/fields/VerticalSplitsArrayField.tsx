@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { generateSplitId, VerticalSplit, HorizontalSplit } from '@/app/schemas/createSingleOrDoubleHungWindow';
+import { VerticalSplit, HorizontalSplit } from '@/app/schemas/createSingleOrDoubleHungWindow';
 
 interface VerticalSplitsArrayFieldProps {
   value: VerticalSplit[];
@@ -23,7 +23,6 @@ export function VerticalSplitsArrayField({
       return;
     }
     const newSplit: VerticalSplit = {
-      id: generateSplitId(),
       position: 12, // Default position in inches
       direction: 'left-to-right',
       horizontal_splits: []
@@ -31,65 +30,64 @@ export function VerticalSplitsArrayField({
     onChange([...value, newSplit]);
   };
 
-  const removeVerticalSplit = (id: string) => {
+  const removeVerticalSplit = (index: number) => {
     if (!Array.isArray(value)) {
       console.error('Invalid value array in VerticalSplitsArrayField:', value);
       return;
     }
-    onChange(value.filter(split => split.id !== id));
+    onChange(value.filter((_, i) => i !== index));
   };
 
-  const updateVerticalSplit = (id: string, field: keyof VerticalSplit, newValue: any) => {
+  const updateVerticalSplit = (index: number, field: keyof VerticalSplit, newValue: any) => {
     if (!Array.isArray(value)) {
       console.error('Invalid value array in VerticalSplitsArrayField:', value);
       return;
     }
-    onChange(value.map(split => 
-      split.id === id ? { ...split, [field]: newValue } : split
+    onChange(value.map((split, i) => 
+      i === index ? { ...split, [field]: newValue } : split
     ));
   };
 
-  const addHorizontalSplit = (verticalSplitId: string) => {
+  const addHorizontalSplit = (verticalSplitIndex: number) => {
     if (!Array.isArray(value)) {
       console.error('Invalid value array in VerticalSplitsArrayField:', value);
       return;
     }
     const newHorizontalSplit: HorizontalSplit = {
-      id: generateSplitId(),
       position: 12, // Default position in inches
       direction: 'top-to-bottom'
     };
     
-    onChange(value.map(split => 
-      split.id === verticalSplitId 
+    onChange(value.map((split, i) => 
+      i === verticalSplitIndex 
         ? { ...split, horizontal_splits: [...split.horizontal_splits, newHorizontalSplit] }
         : split
     ));
   };
 
-  const removeHorizontalSplit = (verticalSplitId: string, horizontalSplitId: string) => {
+  const removeHorizontalSplit = (verticalSplitIndex: number, horizontalSplitIndex: number) => {
     if (!Array.isArray(value)) {
       console.error('Invalid value array in VerticalSplitsArrayField:', value);
       return;
     }
-    onChange(value.map(split => 
-      split.id === verticalSplitId 
-        ? { ...split, horizontal_splits: split.horizontal_splits.filter(h => h.id !== horizontalSplitId) }
+    onChange(value.map((split, i) => 
+      i === verticalSplitIndex 
+        ? { ...split, horizontal_splits: split.horizontal_splits.filter((_, j) => j !== horizontalSplitIndex) }
         : split
     ));
   };
 
-  const updateHorizontalSplit = (verticalSplitId: string, horizontalSplitId: string, field: keyof HorizontalSplit, newValue: any) => {
+  const updateHorizontalSplit = (verticalSplitIndex: number, horizontalSplitIndex: number, field: keyof HorizontalSplit, newValue: any) => {
     if (!Array.isArray(value)) {
       console.error('Invalid value array in VerticalSplitsArrayField:', value);
       return;
     }
-    onChange(value.map(split => 
-      split.id === verticalSplitId 
+    onChange(value.map((split, i) => 
+      i === verticalSplitIndex 
         ? { 
             ...split, 
-            horizontal_splits: split.horizontal_splits.map(h => 
-              h.id === horizontalSplitId ? { ...h, [field]: newValue } : h
+            horizontal_splits: split.horizontal_splits.map((h, j) => 
+              j === horizontalSplitIndex ? { ...h, [field]: newValue } : h
             )
           }
         : split
@@ -104,13 +102,13 @@ export function VerticalSplitsArrayField({
       {Array.isArray(value) && value.length > 0 && (
         <div className="space-y-4">
           {value.map((verticalSplit, vIndex) => (
-            <div key={verticalSplit.id} className="p-3 bg-white rounded border">
+            <div key={vIndex} className="p-3 bg-white rounded border">
               <div className="flex items-center justify-between mb-3">
                 <h5 className="font-medium text-sm">Vertical Split {vIndex + 1}</h5>
                 {editable && (
                   <button
                     type="button"
-                    onClick={() => removeVerticalSplit(verticalSplit.id)}
+                    onClick={() => removeVerticalSplit(vIndex)}
                     className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
                   >
                     Remove
@@ -125,7 +123,7 @@ export function VerticalSplitsArrayField({
                     type="number"
                     step="0.125"
                     value={verticalSplit.position || ''}
-                    onChange={(e) => updateVerticalSplit(verticalSplit.id, 'position', Number(e.target.value))}
+                    onChange={(e) => updateVerticalSplit(vIndex, 'position', Number(e.target.value))}
                     disabled={!editable}
                     className="w-full px-2 py-1 border rounded text-sm"
                   />
@@ -134,7 +132,7 @@ export function VerticalSplitsArrayField({
                   <label className="text-xs font-medium">Direction:</label>
                   <select
                     value={verticalSplit.direction}
-                    onChange={(e) => updateVerticalSplit(verticalSplit.id, 'direction', e.target.value)}
+                    onChange={(e) => updateVerticalSplit(vIndex, 'direction', e.target.value)}
                     disabled={!editable}
                     className="w-full px-2 py-1 border rounded text-sm"
                   >
@@ -151,7 +149,7 @@ export function VerticalSplitsArrayField({
                   {editable && (
                     <button
                       type="button"
-                      onClick={() => addHorizontalSplit(verticalSplit.id)}
+                      onClick={() => addHorizontalSplit(vIndex)}
                       className="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600"
                     >
                       Add Horizontal
@@ -162,7 +160,7 @@ export function VerticalSplitsArrayField({
                 {verticalSplit.horizontal_splits.length > 0 ? (
                   <div className="space-y-2">
                     {verticalSplit.horizontal_splits.map((horizontalSplit, hIndex) => (
-                      <div key={horizontalSplit.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                      <div key={hIndex} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
                         <span className="text-xs">H{hIndex + 1}:</span>
                         
                         <div className="flex items-center gap-1">
@@ -171,7 +169,7 @@ export function VerticalSplitsArrayField({
                             type="number"
                             step="0.125"
                             value={horizontalSplit.position || ''}
-                            onChange={(e) => updateHorizontalSplit(verticalSplit.id, horizontalSplit.id, 'position', Number(e.target.value))}
+                            onChange={(e) => updateHorizontalSplit(vIndex, hIndex, 'position', Number(e.target.value))}
                             disabled={!editable}
                             className="w-16 px-1 py-1 border rounded text-xs"
                           />
@@ -181,7 +179,7 @@ export function VerticalSplitsArrayField({
                           <label className="text-xs">Dir:</label>
                           <select
                             value={horizontalSplit.direction}
-                            onChange={(e) => updateHorizontalSplit(verticalSplit.id, horizontalSplit.id, 'direction', e.target.value)}
+                            onChange={(e) => updateHorizontalSplit(vIndex, hIndex, 'direction', e.target.value)}
                             disabled={!editable}
                             className="px-1 py-1 border rounded text-xs"
                           >
@@ -193,7 +191,7 @@ export function VerticalSplitsArrayField({
                         {editable && (
                           <button
                             type="button"
-                            onClick={() => removeHorizontalSplit(verticalSplit.id, horizontalSplit.id)}
+                            onClick={() => removeHorizontalSplit(vIndex, hIndex)}
                             className="px-1 py-1 bg-red-400 text-white rounded text-xs hover:bg-red-500"
                           >
                             ×
