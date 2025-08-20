@@ -217,32 +217,43 @@ export function WindowMeasurementInterface({
   };
 
   const renderManualMode = () => {
-    const measurementFields = [
-      'width_top_outside', 'width_top_inside', 'width_bottom_outside', 'width_bottom_inside',
-      'height_left_outside', 'height_left_inside', 'height_right_outside', 'height_right_inside',
-      'height_middle'
-    ];
+    if (!itemMeta || typeof itemMeta !== 'object') {
+      console.error('itemMeta is invalid in WindowMeasurementInterface:', itemMeta);
+      return <div className="text-red-500">Error: Window metadata not available</div>;
+    }
+
+    const fields: JSX.Element[] = [];
+    
+    try {
+      for (const [key, config] of Object.entries(itemMeta)) {
+        const fieldConfig = config as any;
+        if (fieldConfig?.omit) continue;
+        
+        const FieldComponent = fieldComponentMap[fieldConfig?.type];
+        if (!FieldComponent) {
+          console.warn(`No field component registered for type: ${fieldConfig?.type}`);
+          continue;
+        }
+
+        fields.push(
+          <div key={key} className="mb-4">
+            <FieldComponent
+              value={value?.[key]}
+              editable={editable}
+              label={fieldConfig.label || key}
+              onChange={(newValue: any) => onChange(key, newValue)}
+            />
+          </div>
+        );
+      }
+    } catch (error) {
+      console.error('Error rendering manual mode fields:', error);
+      return <div className="text-red-500">Error rendering window fields</div>;
+    }
 
     return (
-      <div className="grid grid-cols-2 gap-4">
-        {measurementFields.map(field => {
-          const fieldConfig = itemMeta?.[field];
-          if (!fieldConfig) return null;
-          
-          const FieldComponent = fieldComponentMap[fieldConfig.type];
-          if (!FieldComponent) return null;
-
-          return (
-            <div key={field}>
-              <FieldComponent
-                value={value?.[field]}
-                editable={editable}
-                label={fieldConfig.label}
-                onChange={(newValue: any) => onChange(field, newValue)}
-              />
-            </div>
-          );
-        })}
+      <div className="space-y-4">
+        {fields}
       </div>
     );
   };
