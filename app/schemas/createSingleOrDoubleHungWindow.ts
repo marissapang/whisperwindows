@@ -16,14 +16,12 @@ export function generateSplitId(n=6){
 
 // Type definitions for splits
 export interface VerticalSplit {
-	id: string;
 	position: number; // Position in inches from left edge
 	direction: 'left-to-right' | 'right-to-left';
 	horizontal_splits: HorizontalSplit[];
 }
 
 export interface HorizontalSplit {
-	id: string;
 	position: number; // Position in inches from top edge
 	direction: 'top-to-bottom' | 'bottom-to-top';
 }

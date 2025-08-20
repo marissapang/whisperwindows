@@ -88,6 +88,7 @@ const styles = {
 const permissions = {
 	all: ['Client', 'Sales', 'Manufacturer', 'Installer'],
 	client_sales: ['Client', 'Sales'],
+	sales: ['Sales'],
 	mfg_only: ['Manufacturer'],
 	excl_mfg: ['Client', 'Sales', 'Installer'],
 	none: []
