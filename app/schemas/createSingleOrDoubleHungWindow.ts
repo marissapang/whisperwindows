@@ -8,20 +8,38 @@ function generateWindowId(n=6){
 	return window_id; 
 }
 
+export function generateSplitId(n=6){
+	const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+	const split_id = customAlphabet(alphabet, 6)()
+	return split_id; 
+}
+
+// Type definitions for splits
+export interface VerticalSplit {
+	id: string;
+	position: number; // Position in inches from left edge
+	direction: 'left-to-right' | 'right-to-left';
+	horizontal_splits: HorizontalSplit[];
+}
+
+export interface HorizontalSplit {
+	id: string;
+	position: number; // Position in inches from top edge
+	direction: 'top-to-bottom' | 'bottom-to-top';
+}
+
 function generateEmptySingleOrDoubleHungWindow(){
 	return {
 		Window_Id: generateWindowId(),
 		Window_Type: 'Single/Double Hung Window',
 		Order_Position: 1, // Position in the order sequence
-		width_top_inside: null,
-		width_top_outside: null,
-		height_left_inside: null,
-		height_left_outside: null,
-		width_bottom_inside: null,
-		width_bottom_outside: null,
-		height_right_inside: null,
-		height_right_outside: null,
-		height_middle: null
+		// Four main measurements
+		Top: null,
+		Left: null, 
+		Bottom: null,
+		Right: null,
+		// Split system
+		vertical_splits: [] as VerticalSplit[]
 	}
 }
 
@@ -37,53 +55,33 @@ const singleOrDoubleHungWindowMeta = {
 		'omit': false
 	},
 	Order_Position: {
-		'type': 'number', 
+		'type': 'integer', 
 		'label': "Position in Order", 
 		'omit': false
 	},
-	width_top_inside: {
-		'type': 'number_inches', 
-		'label': "Width Top Inside", 
+	Top: {
+		'type': 'number', 
+		'label': "Top Measurement (inches)", 
 		'omit': false
 	},
-	width_top_outside: {
-		'type': 'number_inches', 
-		'label': "Width Top Outside", 
+	Left: {
+		'type': 'number', 
+		'label': "Left Measurement (inches)", 
 		'omit': false
 	},
-	height_left_inside: {
-		'type': 'number_inches', 
-		'label': "Height Left Inside", 
+	Bottom: {
+		'type': 'number', 
+		'label': "Bottom Measurement (inches)", 
 		'omit': false
 	},
-	height_left_outside: {
-		'type': 'number_inches', 
-		'label': "Height Left Outside", 
+	Right: {
+		'type': 'number', 
+		'label': "Right Measurement (inches)", 
 		'omit': false
 	},
-	width_bottom_inside: {
-		'type': 'number_inches', 
-		'label': "Width Bottom Inside", 
-		'omit': false
-	},
-	width_bottom_outside: {
-		'type': 'number_inches', 
-		'label': "Width Bottom Outside", 
-		'omit': false
-	},
-	height_right_inside: {
-		'type': 'number_inches', 
-		'label': "Height Right Inside", 
-		'omit': false
-	},
-	height_right_outside: {
-		'type': 'number_inches', 
-		'label': "Height Right Outside", 
-		'omit': false
-	},
-	height_middle: {
-		'type': 'number_inches', 
-		'label': "Height Middle", 
+	vertical_splits: {
+		'type': 'vertical_splits_array',
+		'label': "Vertical Splits",
 		'omit': false
 	}
 }
