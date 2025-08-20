@@ -35,23 +35,19 @@ const addressMeta = {
 // // extension functions
 // //-----------------------------------------
 
-// function generateEmptyExtension(){
-// 	return {
-// 	  Extension: true,
-// 	  Depth: 0,
-// 	  Type: 'interior',
-// 	  Support_Notes: '',
-// 	  General_Notes: ''
-// 	}
-// }
+function generateEmptyExtension(){
+	return {
+	  Extension: true,
+	  Configuration: "",
+	  Material: "",
+	  Bottom_Material_Override: "",
+	  Type: 'interior',
+	  Support_Notes: '',
+	  General_Notes: ''
+	}
+}
 
-// const extensionMeta = {
-//   Extension: {'type':'bool', 'label': "Frame Extension?", 'omit':false},
-//   Depth: {'type':'number_inches', 'label': "Extension Depth", 'omit':false},
-//   Type: {'type':'string', 'label': "Extension Type", 'omit':false},
-//   Support_Notes: {'type':'longtext', 'label': "Frame Support Notes", 'omit':true},
-//   General_Notes: {'type':'longtext', 'label': "General Notes", 'omit':false},
-// }
+
 
 
 // //-----------------------------------------
