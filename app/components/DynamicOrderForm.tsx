@@ -1,9 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import { fieldComponentMap } from './fields';
-import { createSingleOrDoubleHungWindow } from '@/app/schemas/createSingleOrDoubleHungWindow';
-
+import React, { useState, useEffect } from 'react';
+import { createBlankOrder } from '../schemas/createBlankOrder';
+import { createSingleOrDoubleHungWindow } from '../schemas/createSingleOrDoubleHungWindow';
+import { processOrderWindows } from '../libs/orderProcessing';
+import ContactForm from './ContactForm';
+import { ExtensionConfigField } from './fields/ExtensionConfigField';
+import { fieldComponentMap } from './fields/index';
 
 export function DynamicOrderForm({
 	order,
@@ -112,10 +115,13 @@ export function DynamicOrderForm({
     setStatus('saving');
 
     try {
+      // Process order data to normalize window measurements
+      const processedOrder = processOrderWindows(order);
+      
       const res = await fetch('/api/orders/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(order),
+        body: JSON.stringify(processedOrder),
       });
 
       const data = await res.json();

@@ -1,5 +1,5 @@
 import { customAlphabet } from 'nanoid';
-import { createSingleOrDoubleHungWindow, singleOrDoubleHungWindowMeta } from './createSingleOrDoubleHungWindow';
+import { createSingleOrDoubleHungWindow, singleOrDoubleHungWindowMeta, calculateAndUpdateWindow } from './createSingleOrDoubleHungWindow';
 
 // helper fun functions
 function generateOrderId(n=6){
@@ -35,17 +35,17 @@ const addressMeta = {
 // // extension functions
 // //-----------------------------------------
 
-function generateEmptyExtension(){
-	return {
-	  Extension: true,
-	  Configuration: "",
-	  Material: "",
-	  Bottom_Material_Override: "",
-	  Type: 'interior',
-	  Support_Notes: '',
-	  General_Notes: ''
-	}
-}
+// function generateEmptyExtension(){
+// 	return {
+// 	  Extension: true,
+// 	  Configuration: "",
+// 	  Material: "",
+// 	  Bottom_Material_Override: "",
+// 	  Type: 'interior',
+// 	  Support_Notes: '',
+// 	  General_Notes: ''
+// 	}
+// }
 
 
 
