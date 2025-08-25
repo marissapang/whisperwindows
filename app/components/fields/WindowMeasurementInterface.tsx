@@ -235,6 +235,20 @@ export function WindowMeasurementInterface({
           continue;
         }
 
+        // Pass window data context for extension_config fields
+        const fieldProps = fieldConfig?.type === 'extension_config' ? {
+          windowData: {
+            original_measurements: {
+              top: value?.['original_measurements.top'] || value?.original_measurements?.top || 0,
+              bottom: value?.['original_measurements.bottom'] || value?.original_measurements?.bottom || 0,
+              left: value?.['original_measurements.left'] || value?.original_measurements?.left || 0,
+              right: value?.['original_measurements.right'] || value?.original_measurements?.right || 0
+            },
+            original_vertical_splits: value?.original_vertical_splits || []
+          }
+        } : {};
+        
+
         fields.push(
           <div key={key} className="mb-4">
             <FieldComponent
@@ -242,6 +256,7 @@ export function WindowMeasurementInterface({
               editable={editable}
               label={fieldConfig.label || key}
               onChange={(newValue: any) => onChange(key, newValue)}
+              {...fieldProps}
             />
           </div>
         );
