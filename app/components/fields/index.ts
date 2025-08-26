@@ -11,7 +11,6 @@ import { LongTextField } from './LongTextField';
 export const fieldComponentMap: Record<string, any> = {
   string: StringField,
   number: NumberInchesField, // Use NumberInchesField for basic numbers too
-  array: ArrayField,
   bool: BooleanField,
   number_inches: NumberInchesField,
   number_dollars: NumberDollarsField,
