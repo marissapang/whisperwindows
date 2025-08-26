@@ -992,16 +992,19 @@ export function calculateAdjustedSplits(
         adjustedSplit.position = split.position - thicknessVector.left;
         adjustedSplit.position_adjustment = -thicknessVector.left;
       } else { // right-to-left
-        // Keep original direction and adjust position accordingly
-        // For right-to-left, interior extension increases the position (moves further from right edge)
-        adjustedSplit.position = split.position + thicknessVector.right;
-        adjustedSplit.position_adjustment = thicknessVector.right;
-        // Preserve original direction
+        // Convert to left-reference first, then adjust
+        const leftReference = workingMeasurements.top - split.position;
+        adjustedSplit.position = leftReference - thicknessVector.right;
+        adjustedSplit.position_adjustment = -thicknessVector.right;
+        adjustedSplit.direction = 'left-to-right'; // Standardize to left-reference
       }
     } else { // exterior
-      // No position adjustment for exterior, preserve original direction and position
-      adjustedSplit.position = split.position;
-      adjustedSplit.position_adjustment = 0;
+      if (split.direction === 'right-to-left') {
+        // Convert to left-reference for consistent output
+        adjustedSplit.position = workingMeasurements.top - split.position;
+        adjustedSplit.direction = 'left-to-right';
+      }
+      // No position adjustment for exterior
     }
     
     // Adjust horizontal splits
