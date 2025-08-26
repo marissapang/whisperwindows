@@ -1,6 +1,4 @@
 {
   "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/api/orders/create/route": "app/api/orders/create/route.js",
-  "/page": "app/page.js",
   "/dev/MVP/page": "app/dev/MVP/page.js"
 }
