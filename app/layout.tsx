@@ -21,7 +21,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       {gtmId ? <GoogleTagManager gtmId={gtmId} /> : null}
       <body className={inter.className}>
         {/* Fire SPA pageviews on route changes */}
-        <GtmPageView />
+        <Suspense fallback={null}>
+          <GtmPageView />
+        </Suspense>
         {children}
       </body>
     </html>
