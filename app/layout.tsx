@@ -20,6 +20,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       {/* Per Next.js docs: mount GTM at the root */}
       {gtmId ? <GoogleTagManager gtmId={gtmId} /> : null}
+      {console.log("Root Layout")}
+      {console.log("gtmId is: "+gtmId)}
       <body className={inter.className}>
         {/* Fire SPA pageviews on route changes */}
         <Suspense fallback={null}>
