@@ -1017,16 +1017,16 @@ export function calculateAdjustedSplits(
           adjustedHSplit.position = hSplit.position - thicknessVector.top;
           adjustedHSplit.position_adjustment = -thicknessVector.top;
         } else { // bottom-to-top
-          const topReference = workingMeasurements.left - hSplit.position;
-          adjustedHSplit.position = topReference - thicknessVector.bottom;
-          adjustedHSplit.position_adjustment = -thicknessVector.bottom;
-          adjustedHSplit.direction = 'top-to-bottom';
+          // Keep original direction and adjust position accordingly
+          // For bottom-to-top, interior extension increases the position (moves further from bottom edge)
+          adjustedHSplit.position = hSplit.position + thicknessVector.bottom;
+          adjustedHSplit.position_adjustment = thicknessVector.bottom;
+          // Preserve original direction
         }
       } else { // exterior
-        if (hSplit.direction === 'bottom-to-top') {
-          adjustedHSplit.position = workingMeasurements.left - hSplit.position;
-          adjustedHSplit.direction = 'top-to-bottom';
-        }
+        // No position adjustment for exterior, preserve original direction and position
+        adjustedHSplit.position = hSplit.position;
+        adjustedHSplit.position_adjustment = 0;
       }
       
       return adjustedHSplit;
