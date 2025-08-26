@@ -4,6 +4,8 @@ import { useState, useRef } from 'react';
 import { useRouter, redirect } from 'next/navigation'
 import emailjs from '@emailjs/browser';
 import { useFormFields } from '../libs/hooksLib';
+import { sendGTMEvent } from '@next/third-parties/google';
+
 
 
 export default function ContactForm() {
@@ -43,6 +45,7 @@ export default function ContactForm() {
 	      setFormError("Form successfully submitted! If you do not receive a confirmation within 5 minutes, please check your spam folder")
            resetFields(emptyFormFields)
            setFormSuccess(true)
+           sendGTMEvent({ event: 'contact_form_submit' });
 
            
 
@@ -55,8 +58,6 @@ export default function ContactForm() {
 	      .then((results)=>{
 	      	console.log("seeing results!")
 	          console.log(results);
-               // const router = useRouter()
-               // router.push('/interest-form-success')
                redirect('/interest-form-success')
 	      },(error)=>{
 	      	console.log("there is an error...")
