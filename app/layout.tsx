@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Suspense } from 'react';
 import { GoogleTagManager } from '@next/third-parties/google';
 import GtmPageView from './gtm-pageview'; //
 
