@@ -7,6 +7,7 @@ import { useFormFields } from '../libs/hooksLib';
 import { sendGTMEvent } from '@next/third-parties/google';
 
 
+const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
 
 export default function ContactForm() {
 	const [formError, setFormError] = useState(" ")
