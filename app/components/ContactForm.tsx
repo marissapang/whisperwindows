@@ -46,6 +46,7 @@ export default function ContactForm() {
            resetFields(emptyFormFields)
            setFormSuccess(true)
            sendGTMEvent({ event: 'contact_form_submit' });
+          await sleep(350);
 
            
 
