@@ -40,6 +40,22 @@ export function DynamicOrderForm({
     return truePath.join('.');
   };
 
+	const getNestedValue = (obj: any, path: string): any => {
+		const realPath = pruneMetaPath(orderMeta, path);
+		const keys = realPath.split('.');
+		let cursor = obj;
+
+		for (const key of keys) {
+			if (cursor && typeof cursor === 'object' && key in cursor) {
+				cursor = cursor[key];
+			} else {
+				return undefined;
+			}
+		}
+
+		return cursor;
+	};
+
 	const updateNestedField = (obj: any, path: string, value: any) => {
 		const realPath = pruneMetaPath(orderMeta, path);
 		const keys = realPath.split('.');
@@ -222,6 +238,14 @@ export function DynamicOrderForm({
       const label = fieldConfig.label || key;
       const type = fieldConfig.type;
 
+      // Debug all field types
+      console.log('Processing field:', {
+        key,
+        type,
+        fullPath,
+        isVerticalSplits: type === 'vertical_splits_array'
+      });
+
       const FieldComponent = fieldComponentMap[type];
 
       if (!FieldComponent) {
@@ -229,20 +253,61 @@ export function DynamicOrderForm({
         continue;
       }
 
-      fields.push(
-        <div key={`wrapper-${fullPath}`} className={padding}>
-          <FieldComponent
-            value={value}
-            editable={editable}
-            label={label}
-            options={fieldConfig.options}
-            onChange={(v: any) => {
-              const updated = updateNestedField(order, fullPath, v);
-              setOrder(updated);
-            }}
-          />
-        </div>
-      );
+      // Special handling for vertical splits field to add Save functionality
+      if (type === 'vertical_splits_array') {
+        // Handle nested path for vertical_splits_saved
+        // Replace 'original_vertical_splits' with 'vertical_splits_saved' in the path
+        const verticalSplitsSavedPath = fullPath.replace('original_vertical_splits', 'vertical_splits_saved');
+        const isVerticalSplitsSaved = getNestedValue(order, verticalSplitsSavedPath);
+        
+        // Debug logging
+        console.log('Vertical splits debug:', {
+          type,
+          fullPath,
+          verticalSplitsSavedPath,
+          isVerticalSplitsSaved,
+          editable,
+          showSaveButton: editable && !isVerticalSplitsSaved,
+          order: order
+        });
+        
+        fields.push(
+          <div key={`wrapper-${fullPath}`} className={padding}>
+            <FieldComponent
+              value={value}
+              editable={editable}
+              label={label}
+              options={fieldConfig.options}
+              showSaveButton={editable && !isVerticalSplitsSaved}
+              onSaveVerticalSplits={() => {
+                console.log('Save vertical splits clicked, updating path:', verticalSplitsSavedPath);
+                // Mark vertical splits as saved and trigger horizontal subsections generation
+                const updatedOrder = updateNestedField(order, verticalSplitsSavedPath, true);
+                setOrder(updatedOrder);
+              }}
+              onChange={(v: any) => {
+                const updated = updateNestedField(order, fullPath, v);
+                setOrder(updated);
+              }}
+            />
+          </div>
+        );
+      } else {
+        fields.push(
+          <div key={`wrapper-${fullPath}`} className={padding}>
+            <FieldComponent
+              value={value}
+              editable={editable}
+              label={label}
+              options={fieldConfig.options}
+              onChange={(v: any) => {
+                const updated = updateNestedField(order, fullPath, v);
+                setOrder(updated);
+              }}
+            />
+          </div>
+        );
+      }
 
 
     }
