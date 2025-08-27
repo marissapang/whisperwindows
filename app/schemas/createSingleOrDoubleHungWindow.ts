@@ -2,9 +2,12 @@ import { customAlphabet } from 'nanoid';
 import { 
   generateEmptyExtension,
   calculateExtensionResults,
+  generateHorizontalSubsections,
+  calculateAdjustedHorizontalSubsections,
   type ExtensionConfig,
   type VerticalSplit,
   type HorizontalSplit,
+  type HorizontalSplitSubsection,
   type WindowMeasurements,
   type CalculatedMeasurements,
   type FramePiece,
@@ -16,7 +19,7 @@ import {
 function generateWindowId(n=6){
 	const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 	const window_id = customAlphabet(alphabet, 6)()
-	console.log(`inside genWindowID: window id is ${window_id}`)
+	console.log(`window id is ${window_id}`)
 	return window_id; 
 }
 
@@ -30,7 +33,6 @@ export function generateSplitId(n=6){
 export type { ExtensionConfig, VerticalSplit, HorizontalSplit, WindowMeasurements, CalculatedMeasurements, FramePiece, CutListItem };
 
 export interface SingleOrDoubleHungWindow {
-	// Core identification
 	Window_Id: string;
 	Window_Type: 'Single/Double Hung Window';
 	Order_Position: number;
@@ -39,12 +41,16 @@ export interface SingleOrDoubleHungWindow {
 	original_measurements: WindowMeasurements;
 	original_vertical_splits: VerticalSplit[];
 	
-	// === EXTENSION CONFIGURATION ===
+	// === HORIZONTAL SPLITS BY SUBSECTION ===
+	original_horizontal_subsections: HorizontalSplitSubsection[];
+	vertical_splits_saved: boolean; // Tracks if vertical splits have been saved to enable horizontal input
+	
 	extension: ExtensionConfig;
 	
-	// === CALCULATED VALUES (Auto-populated, Read-only in UI) ===
+	// === CALCULATED VALUES ===
 	calculated_measurements: CalculatedMeasurements;
 	calculated_vertical_splits: VerticalSplit[];
+	calculated_horizontal_subsections: HorizontalSplitSubsection[];
 	effective_dimensions: {
 		width: number;
 		height: number;
@@ -89,6 +95,10 @@ function generateEmptySingleOrDoubleHungWindow(): SingleOrDoubleHungWindow {
 		},
 		original_vertical_splits: [],
 		
+		// Horizontal splits by subsection
+		original_horizontal_subsections: [],
+		vertical_splits_saved: false,
+		
 		// Extension configuration
 		extension: generateEmptyExtension(),
 		
@@ -102,6 +112,7 @@ function generateEmptySingleOrDoubleHungWindow(): SingleOrDoubleHungWindow {
 			transformation_type: null
 		},
 		calculated_vertical_splits: [],
+		calculated_horizontal_subsections: [],
 		effective_dimensions: {
 			width: 0,
 			height: 0
@@ -157,31 +168,126 @@ function generateEmptySingleOrDoubleHungWindow(): SingleOrDoubleHungWindow {
 // Function to calculate and update window with extension results
 export function calculateAndUpdateWindow(window: SingleOrDoubleHungWindow): SingleOrDoubleHungWindow {
 	try {
-		const results = calculateExtensionResults(
-			window.original_measurements,
-			window.original_vertical_splits,
-			window.extension
-		);
+		// Check if we have valid measurements for extension calculations
+		// Access measurements using both dot notation and nested object notation
+		const getmeasurement = (field: string) => {
+			return (window as any)[`original_measurements.${field}`] || window.original_measurements?.[field] || 0;
+		};
 		
+		const topMeasurement = getmeasurement('top');
+		const bottomMeasurement = getmeasurement('bottom');
+		const leftMeasurement = getmeasurement('left');
+		const rightMeasurement = getmeasurement('right');
+		
+		const hasValidMeasurements = topMeasurement > 0 && bottomMeasurement > 0 && 
+			leftMeasurement > 0 && rightMeasurement > 0;
+
+		// Generate horizontal subsections if vertical splits are saved
+		let updatedOriginalHorizontalSubsections = window.original_horizontal_subsections;
+		let calculatedHorizontalSubsections: HorizontalSplitSubsection[] = [];
+		
+		if (window.vertical_splits_saved) {
+			// First, generate the subsection structure from vertical splits
+			// Pass window width if available for proper boundary calculations
+			// Use top measurement as window width, or fallback to bottom if top is zero
+			let windowWidth: number | undefined;
+			if (topMeasurement > 0) {
+				windowWidth = topMeasurement;
+			} else if (bottomMeasurement > 0) {
+				windowWidth = bottomMeasurement;
+			}
+			let baseSubsections = generateHorizontalSubsections(
+				window.original_vertical_splits,
+				windowWidth
+			);
+			
+			// Copy over any existing horizontal splits from original subsections
+			// Normalize all horizontal splits to top-to-bottom reference
+			if (window.original_horizontal_subsections.length > 0) {
+				baseSubsections = baseSubsections.map(calcSubsection => {
+					const matchingOriginal = window.original_horizontal_subsections.find(
+						orig => orig.subsection_label === calcSubsection.subsection_label
+					);
+					if (matchingOriginal) {
+						// Normalize horizontal splits to top-to-bottom reference
+						const normalizedSplits = matchingOriginal.horizontal_splits.map(split => {
+							if (split.direction === 'bottom-to-top' && windowWidth) {
+								return {
+									...split,
+									position: windowWidth - split.position,
+									direction: 'top-to-bottom' as const
+								};
+							}
+							return {
+								...split,
+								direction: 'top-to-bottom' as const
+							};
+						});
+						
+						return {
+							...calcSubsection,
+							horizontal_splits: normalizedSplits
+						};
+					}
+					return calcSubsection;
+				});
+			}
+			
+			// Update original horizontal subsections for user input
+			updatedOriginalHorizontalSubsections = baseSubsections;
+			
+			if (hasValidMeasurements) {
+				const measurementsForCalculation = {
+					top: topMeasurement,
+					bottom: bottomMeasurement,
+					left: leftMeasurement,
+					right: rightMeasurement
+				};
+				
+				const results = calculateExtensionResults(
+					measurementsForCalculation,
+					window.original_vertical_splits,
+					window.extension
+				);
+				
+				calculatedHorizontalSubsections = calculateAdjustedHorizontalSubsections(
+					baseSubsections,
+					window.extension,
+					results.thicknessVector,
+					results.workingMeasurements,
+					results.calculatedSplits
+				);
+				
+				// Return window with full calculations
+				return {
+					...window,
+					original_horizontal_subsections: updatedOriginalHorizontalSubsections,
+					calculated_measurements: results.workingMeasurements,
+					calculated_vertical_splits: results.calculatedSplits,
+					calculated_horizontal_subsections: calculatedHorizontalSubsections,
+					effective_dimensions: results.effectiveDimensions,
+					frame_pieces: {
+						topPiece: results.framePieces.topPiece,
+						bottomPiece: results.framePieces.bottomPiece,
+						leftPiece: results.framePieces.leftPiece,
+						rightPiece: results.framePieces.rightPiece
+					},
+					cut_list: results.cutList,
+					thickness_vector: {
+						top: results.thicknessVector.top,
+						left: results.thicknessVector.left,
+						bottom: results.thicknessVector.bottom,
+						right: results.thicknessVector.right
+					},
+					calculation_summary: results.calculationSummary
+				};
+			}
+		}
+		
+		// Return window with only horizontal subsections updated (no extension calculations)
 		return {
 			...window,
-			calculated_measurements: results.workingMeasurements,
-			calculated_vertical_splits: results.calculatedSplits,
-			effective_dimensions: results.effectiveDimensions,
-			frame_pieces: {
-				topPiece: results.framePieces.topPiece,
-				bottomPiece: results.framePieces.bottomPiece,
-				leftPiece: results.framePieces.leftPiece,
-				rightPiece: results.framePieces.rightPiece
-			},
-			cut_list: results.cutList,
-			thickness_vector: {
-				top: results.thicknessVector.top,
-				left: results.thicknessVector.left,
-				bottom: results.thicknessVector.bottom,
-				right: results.thicknessVector.right
-			},
-			calculation_summary: results.calculationSummary
+			original_horizontal_subsections: updatedOriginalHorizontalSubsections
 		};
 	} catch (error) {
 		console.error('Extension calculation failed:', error);
@@ -234,6 +340,18 @@ const singleOrDoubleHungWindowMeta = {
 		'omit': false
 	},
 	
+	// Horizontal splits by subsection
+	original_horizontal_subsections: {
+		'type': 'horizontal_subsections_array',
+		'label': "Horizontal Splits by Subsection",
+		'omit': false
+	},
+	vertical_splits_saved: {
+		'type': 'boolean',
+		'label': "Vertical Splits Saved",
+		'omit': true 
+	},
+	
 	// Extension configuration
 	extension: {
 		'type': 'extension_config',
@@ -245,37 +363,42 @@ const singleOrDoubleHungWindowMeta = {
 	calculated_measurements: {
 		'type': 'nested_object',
 		'label': "Calculated Measurements",
-		'omit': true // Hidden from form, calculated automatically
+		'omit': true 
 	},
 	calculated_vertical_splits: {
 		'type': 'vertical_splits_array',
 		'label': "Calculated Splits",
-		'omit': true // Hidden from form, calculated automatically
+		'omit': true 
+	},
+	calculated_horizontal_subsections: {
+		'type': 'horizontal_subsections_array',
+		'label': "Calculated Horizontal Subsections",
+		'omit': true 
 	},
 	effective_dimensions: {
 		'type': 'nested_object',
 		'label': "Effective Dimensions",
-		'omit': true // Hidden from form, calculated automatically
+		'omit': true 
 	},
 	frame_pieces: {
 		'type': 'nested_object',
 		'label': "Frame Pieces",
-		'omit': true // Hidden from form, calculated automatically
+		'omit': true 
 	},
 	cut_list: {
 		'type': 'array',
 		'label': "Cut List",
-		'omit': true // Hidden from form, calculated automatically
+		'omit': true 
 	},
 	thickness_vector: {
 		'type': 'nested_object',
 		'label': "Thickness Vector",
-		'omit': true // Hidden from form, calculated automatically
+		'omit': true 
 	},
 	calculation_summary: {
 		'type': 'nested_object',
 		'label': "Calculation Summary",
-		'omit': true // Hidden from form, calculated automatically
+		'omit': true 
 	}
 }
 
