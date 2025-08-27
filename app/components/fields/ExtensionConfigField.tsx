@@ -18,6 +18,8 @@ interface ExtensionConfigFieldProps {
   windowData?: {
     original_measurements: WindowMeasurements;
     original_vertical_splits: VerticalSplit[];
+    original_horizontal_subsections?: any[];
+    calculated_horizontal_subsections?: any[];
   };
 }
 
@@ -66,9 +68,11 @@ export function ExtensionConfigField({ value, onChange, label, name, windowData 
         windowData?.original_vertical_splits || [],
         config
       );
+      
       setCalculationResults(results);
       setShowCalculations(true);
     } catch (error) {
+      console.error('Extension calculation error:', error);
       setCalculationResults({ error: error instanceof Error ? error.message : 'Calculation failed' });
       setShowCalculations(true);
     }
@@ -308,10 +312,10 @@ export function ExtensionConfigField({ value, onChange, label, name, windowData 
                   </div>
                 </div>
 
-                {/* Split Recalculation */}
+                {/* Vertical Split Recalculation */}
                 {calculationResults.calculatedSplits && calculationResults.calculatedSplits.length > 0 && (
                   <div className="bg-indigo-50 rounded-md p-3">
-                    <h5 className="font-medium text-indigo-900 mb-2">Split Positions</h5>
+                    <h5 className="font-medium text-indigo-900 mb-2">Vertical Split Positions</h5>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       {calculationResults.calculatedSplits.map((split: any, index: number) => (
                         <div key={index}>
@@ -321,6 +325,7 @@ export function ExtensionConfigField({ value, onChange, label, name, windowData 
                     </div>
                   </div>
                 )}
+
 
                 {/* Configuration Summary */}
                 <div className="bg-gray-50 rounded-md p-3">
