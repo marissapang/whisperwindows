@@ -20,13 +20,7 @@ export function VerticalSplitsArrayField({
   showSaveButton = false
 }: VerticalSplitsArrayFieldProps) {
 
-  // Debug logging
-  console.log('VerticalSplitsArrayField props:', {
-    editable,
-    showSaveButton,
-    onSaveVerticalSplits: !!onSaveVerticalSplits,
-    valueLength: value?.length || 0
-  });
+
 
   const addVerticalSplit = () => {
     if (!Array.isArray(value)) {
