@@ -1,12 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { createBlankOrder } from '../schemas/createBlankOrder';
-import { createSingleOrDoubleHungWindow } from '../schemas/createSingleOrDoubleHungWindow';
-import { processOrderWindows } from '../libs/orderProcessing';
-import ContactForm from './ContactForm';
-import { ExtensionConfigField } from './fields/ExtensionConfigField';
-import { fieldComponentMap } from './fields/index';
+import { useState } from 'react';
+import { fieldComponentMap } from './fields';
+import { createSingleOrDoubleHungWindow } from '@/app/schemas/createSingleOrDoubleHungWindow';
+import { prepareOrderForDatabase } from '@/app/libs/orderProcessing';
+
 
 export function DynamicOrderForm({
 	order,
@@ -115,9 +113,9 @@ export function DynamicOrderForm({
     setStatus('saving');
 
     try {
-      // Process order data to normalize window measurements
-      const processedOrder = processOrderWindows(order);
-      
+      // Process order with extension calculations before saving
+      const processedOrder = prepareOrderForDatabase(order);
+
       const res = await fetch('/api/orders/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -223,10 +221,6 @@ export function DynamicOrderForm({
       const editable = perms.editableBy.includes(view) && !perms.readOnlyStages.includes(order.Order_Status);
       const label = fieldConfig.label || key;
       const type = fieldConfig.type;
-
-      console.log(`field is: ${key}`)
-      console.log(perms)
-      console.log(editable)
 
       const FieldComponent = fieldComponentMap[type];
 

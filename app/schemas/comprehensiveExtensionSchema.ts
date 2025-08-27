@@ -980,10 +980,17 @@ export function calculateAdjustedSplits(
   }
   
   return originalSplits.map(split => {
+    // Normalize original_position to left-to-right for consistent database storage
+    let normalizedOriginalPosition = split.position;
+    if (split.direction === 'right-to-left') {
+      normalizedOriginalPosition = workingMeasurements.top - split.position;
+    }
+    
     const adjustedSplit: VerticalSplit = {
       ...split,
-      original_position: split.position,
-      position_adjustment: 0
+      original_position: normalizedOriginalPosition,
+      position_adjustment: 0,
+      direction: 'left-to-right' // Always store as left-to-right in database
     };
     
     // Apply directional adjustment based on interior/exterior type
@@ -996,13 +1003,11 @@ export function calculateAdjustedSplits(
         const leftReference = workingMeasurements.top - split.position;
         adjustedSplit.position = leftReference - thicknessVector.right;
         adjustedSplit.position_adjustment = -thicknessVector.right;
-        adjustedSplit.direction = 'left-to-right'; // Standardize to left-reference
       }
     } else { // exterior
       if (split.direction === 'right-to-left') {
         // Convert to left-reference for consistent output
         adjustedSplit.position = workingMeasurements.top - split.position;
-        adjustedSplit.direction = 'left-to-right';
       }
       // No position adjustment for exterior
     }

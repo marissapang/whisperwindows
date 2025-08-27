@@ -34,6 +34,24 @@ function normalizeWindowData(window: any): SingleOrDoubleHungWindow {
     };
   }
   
+  // Normalize vertical splits to left-to-right for consistent database storage
+  if (normalized.original_vertical_splits && Array.isArray(normalized.original_vertical_splits)) {
+    const windowWidth = normalized.original_measurements?.top || 0;
+    normalized.original_vertical_splits = normalized.original_vertical_splits.map(split => {
+      if (split.direction === 'right-to-left') {
+        return {
+          ...split,
+          position: windowWidth - split.position,
+          direction: 'left-to-right'
+        };
+      }
+      return {
+        ...split,
+        direction: 'left-to-right' // Ensure all splits are marked as left-to-right
+      };
+    });
+  }
+  
   // Clean up dot notation fields
   delete normalized['original_measurements.top'];
   delete normalized['original_measurements.bottom'];
@@ -124,14 +142,11 @@ export function prepareOrderForDatabase(order: any): any {
   // Process all windows with calculations
   const processedOrder = processOrderWindows(order);
   
-  // Add metadata
-  const orderWithMetadata = {
+  // Add last updated timestamp
+  return {
     ...processedOrder,
-    last_updated: new Date().toISOString(),
-    calculation_version: '1.0.0'
+    last_updated: new Date().toISOString()
   };
-
-  return orderWithMetadata;
 }
 
 export default {
