@@ -45,7 +45,6 @@ export interface CalculatedMeasurements extends WindowMeasurements {
 export interface VerticalSplit {
   position: number;                           // Position in inches from LEFT edge
   direction: 'left-to-right' | 'right-to-left';
-  horizontal_splits: HorizontalSplit[];
   // Calculation tracking
   original_position?: number;
   position_adjustment?: number;
@@ -57,6 +56,14 @@ export interface HorizontalSplit {
   // Calculation tracking
   original_position?: number;
   position_adjustment?: number;
+}
+
+// New interface for horizontal splits organized by window subsections
+export interface HorizontalSplitSubsection {
+  subsection_label: string;                   // e.g., "Left to Split 1", "Split 1 to Split 2", "Split 2 to Right"
+  left_boundary: number;                      // Left boundary position (in left-to-right coordinates)
+  right_boundary: number;                     // Right boundary position (in left-to-right coordinates)
+  horizontal_splits: HorizontalSplit[];       // Horizontal splits within this subsection
 }
 
 // Extension configuration interface
@@ -109,12 +116,17 @@ export interface SingleOrDoubleHungWindow {
   original_measurements: WindowMeasurements;
   original_vertical_splits: VerticalSplit[];
   
+  // === HORIZONTAL SPLITS BY SUBSECTION ===
+  original_horizontal_subsections: HorizontalSplitSubsection[];
+  vertical_splits_saved: boolean; // Tracks if vertical splits have been saved to enable horizontal input
+  
   // === EXTENSION CONFIGURATION ===
   extension: ExtensionConfig;
   
   // === CALCULATED VALUES (Auto-populated, Read-only in UI) ===
   calculated_measurements: CalculatedMeasurements;
   calculated_vertical_splits: VerticalSplit[];
+  calculated_horizontal_subsections: HorizontalSplitSubsection[];
   effective_dimensions: {
     width: number;
     height: number;
@@ -208,6 +220,10 @@ export function generateEmptySingleOrDoubleHungWindow(): SingleOrDoubleHungWindo
     },
     original_vertical_splits: [],
     
+    // Horizontal splits by subsection
+    original_horizontal_subsections: [],
+    vertical_splits_saved: false,
+    
     // Extension configuration
     extension: generateEmptyExtension(),
     
@@ -221,6 +237,7 @@ export function generateEmptySingleOrDoubleHungWindow(): SingleOrDoubleHungWindo
       transformation_type: null
     },
     calculated_vertical_splits: [],
+    calculated_horizontal_subsections: [],
     effective_dimensions: {
       width: 0,
       height: 0
@@ -617,6 +634,18 @@ export const singleOrDoubleHungWindowMeta = {
     'omit': false
   },
   
+  original_horizontal_subsections: {
+    'type': 'horizontal_subsections_array',
+    'label': "Horizontal Splits by Subsection",
+    'omit': false
+  },
+  
+  vertical_splits_saved: {
+    'type': 'bool',
+    'label': "Vertical Splits Saved",
+    'omit': true // Hidden field for state management
+  },
+  
   // Extension configuration
   extension: {
     'type': 'extension_config',
@@ -633,6 +662,11 @@ export const singleOrDoubleHungWindowMeta = {
   calculated_vertical_splits: {
     'type': 'vertical_splits_array',
     'label': "Calculated Splits",
+    'omit': true // Hidden from form, calculated automatically
+  },
+  calculated_horizontal_subsections: {
+    'type': 'horizontal_subsections_array',
+    'label': "Calculated Horizontal Subsections",
     'omit': true // Hidden from form, calculated automatically
   },
   effective_dimensions: {
@@ -742,12 +776,7 @@ export function validateVerticalSplits(splits: VerticalSplit[], windowWidth: num
       errors.push(`Split ${index + 1}: Invalid direction ${split.direction}`);
     }
     
-    // Validate horizontal splits
-    split.horizontal_splits.forEach((hSplit, hIndex) => {
-      if (!['top-to-bottom', 'bottom-to-top'].includes(hSplit.direction)) {
-        errors.push(`Split ${index + 1}, Horizontal ${hIndex + 1}: Invalid direction ${hSplit.direction}`);
-      }
-    });
+    // Note: Horizontal splits validation moved to subsection validation
   });
   
   return {
@@ -1012,36 +1041,93 @@ export function calculateAdjustedSplits(
       // No position adjustment for exterior
     }
     
-    // Adjust horizontal splits
-    adjustedSplit.horizontal_splits = split.horizontal_splits.map(hSplit => {
-      const adjustedHSplit: HorizontalSplit = {
-        ...hSplit,
-        original_position: hSplit.position,
-        position_adjustment: 0
-      };
-      
-      if (extensionConfig.Type === 'interior') {
-        if (hSplit.direction === 'top-to-bottom') {
-          adjustedHSplit.position = hSplit.position - thicknessVector.top;
-          adjustedHSplit.position_adjustment = -thicknessVector.top;
-        } else { // bottom-to-top
-          const topReference = workingMeasurements.left - hSplit.position;
-          adjustedHSplit.position = topReference - thicknessVector.bottom;
-          adjustedHSplit.position_adjustment = -thicknessVector.bottom;
-          adjustedHSplit.direction = 'top-to-bottom';
-        }
-      } else { // exterior
-        if (hSplit.direction === 'bottom-to-top') {
-          adjustedHSplit.position = workingMeasurements.left - hSplit.position;
-          adjustedHSplit.direction = 'top-to-bottom';
-        }
-      }
-      
-      return adjustedHSplit;
-    });
+    // Note: Horizontal splits adjustment moved to subsection processing
     
     return adjustedSplit;
   });
+}
+
+// Function to generate horizontal subsections from vertical splits
+export function generateHorizontalSubsections(
+  verticalSplits: VerticalSplit[],
+  windowWidth?: number
+): HorizontalSplitSubsection[] {
+  if (!verticalSplits || verticalSplits.length === 0) {
+    // No vertical splits - single subsection for entire window
+    return [{
+      subsection_label: "Full Window",
+      left_boundary: 0,
+      right_boundary: windowWidth || 100, // Use 100 as default placeholder
+      horizontal_splits: []
+    }];
+  }
+
+  // Normalize all vertical splits to left-to-right reference and sort by position
+  const sortedSplits = [...verticalSplits]
+    .map((split, index) => {
+      let normalizedPosition = split.position;
+      
+      // Normalize right-to-left splits to left-to-right reference
+      if (split.direction === 'right-to-left') {
+        if (windowWidth) {
+          normalizedPosition = windowWidth - split.position;
+        } else {
+          // If no window width, we need to find the maximum position to normalize
+          const maxPosition = Math.max(...verticalSplits.map(s => s.position));
+          normalizedPosition = maxPosition - split.position;
+        }
+      }
+      
+      return {
+        ...split,
+        position: normalizedPosition,
+        direction: 'left-to-right' as const, // Normalize direction for consistent processing
+        originalIndex: index // Keep track of original order for labeling
+      };
+    })
+    .sort((a, b) => {
+      // First sort by position
+      if (a.position !== b.position) {
+        return a.position - b.position;
+      }
+      // If positions are equal, sort by original index to maintain consistent ordering
+      return a.originalIndex - b.originalIndex;
+    });
+
+  const subsections: HorizontalSplitSubsection[] = [];
+  
+  // Create subsection from left edge to first split
+  const firstSplitLabel = `Split ${sortedSplits[0].originalIndex + 1}`;
+  subsections.push({
+    subsection_label: `Left to ${firstSplitLabel}`,
+    left_boundary: 0,
+    right_boundary: sortedSplits[0].position,
+    horizontal_splits: []
+  });
+  
+  // Create subsections between splits
+  for (let i = 0; i < sortedSplits.length - 1; i++) {
+    const currentSplitLabel = `Split ${sortedSplits[i].originalIndex + 1}`;
+    const nextSplitLabel = `Split ${sortedSplits[i + 1].originalIndex + 1}`;
+    subsections.push({
+      subsection_label: `${currentSplitLabel} to ${nextSplitLabel}`,
+      left_boundary: sortedSplits[i].position,
+      right_boundary: sortedSplits[i + 1].position,
+      horizontal_splits: []
+    });
+  }
+  
+  // Create subsection from last split to right edge
+  const rightEdge = windowWidth || (sortedSplits[sortedSplits.length - 1].position + 20);
+  const lastSplitLabel = `Split ${sortedSplits[sortedSplits.length - 1].originalIndex + 1}`;
+  subsections.push({
+    subsection_label: `${lastSplitLabel} to Right`,
+    left_boundary: sortedSplits[sortedSplits.length - 1].position,
+    right_boundary: rightEdge,
+    horizontal_splits: []
+  });
+  
+  return subsections;
 }
 
 export function generateCutList(
@@ -1075,6 +1161,58 @@ export function generateCutList(
 // ===================================================================
 // 12. COMPLETE CALCULATION ENGINE
 // ===================================================================
+
+// Function to calculate adjusted horizontal splits within subsections
+export function calculateAdjustedHorizontalSubsections(
+  originalSubsections: HorizontalSplitSubsection[],
+  extensionConfig: ExtensionConfig,
+  thicknessVector: Record<string, number>,
+  workingMeasurements: CalculatedMeasurements,
+  calculatedVerticalSplits: VerticalSplit[]
+): HorizontalSplitSubsection[] {
+  if (!extensionConfig.Extension) {
+    return originalSubsections;
+  }
+
+  // Create updated subsections with calculated vertical split boundaries
+  const updatedSubsections = generateHorizontalSubsections(
+    calculatedVerticalSplits,
+    workingMeasurements.top
+  );
+
+  // Map original subsections to updated ones and adjust horizontal splits
+  return originalSubsections.map((originalSubsection, index) => {
+    const updatedSubsection = updatedSubsections[index] || originalSubsection;
+    
+    return {
+      ...updatedSubsection, // Use updated boundaries from calculated vertical splits
+      horizontal_splits: originalSubsection.horizontal_splits.map(split => {
+        // Normalize to top-to-bottom reference first using window height (left measurement)
+        let normalizedPosition = split.position;
+        if (split.direction === 'bottom-to-top') {
+          normalizedPosition = workingMeasurements.left - split.position;
+        }
+
+        const adjustedSplit: HorizontalSplit = {
+          position: normalizedPosition,
+          direction: 'top-to-bottom', // Always store as top-to-bottom in database
+          original_position: split.position,
+          position_adjustment: 0
+        };
+
+        // Apply directional adjustment based on interior/exterior type
+        // For horizontal splits, use the top/bottom thickness adjustments
+        if (extensionConfig.Type === 'interior') {
+          adjustedSplit.position = normalizedPosition - thicknessVector.top;
+          adjustedSplit.position_adjustment = -thicknessVector.top;
+        }
+        // For exterior extensions, no position adjustment needed - splits stay in same position
+
+        return adjustedSplit;
+      })
+    };
+  });
+}
 
 export function calculateExtensionResults(
   originalMeasurements: WindowMeasurements,
@@ -1176,6 +1314,7 @@ export default {
   calculateFramePieces,
   calculateEffectiveDimensions,
   calculateAdjustedSplits,
+  calculateAdjustedHorizontalSubsections,
   generateCutList,
   calculateExtensionResults,
   
