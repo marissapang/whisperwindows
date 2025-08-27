@@ -1,21 +1,32 @@
 'use client';
 
-import { useState } from 'react';
-import { VerticalSplit, HorizontalSplit } from '@/app/schemas/createSingleOrDoubleHungWindow';
+import { VerticalSplit } from '@/app/schemas/comprehensiveExtensionSchema';
 
 interface VerticalSplitsArrayFieldProps {
   value: VerticalSplit[];
   editable: boolean;
   label: string;
   onChange: (splits: VerticalSplit[]) => void;
+  onSaveVerticalSplits?: () => void;
+  showSaveButton?: boolean;
 }
 
 export function VerticalSplitsArrayField({ 
   value = [], 
   editable, 
   label, 
-  onChange 
+  onChange,
+  onSaveVerticalSplits,
+  showSaveButton = false
 }: VerticalSplitsArrayFieldProps) {
+
+  // Debug logging
+  console.log('VerticalSplitsArrayField props:', {
+    editable,
+    showSaveButton,
+    onSaveVerticalSplits: !!onSaveVerticalSplits,
+    valueLength: value?.length || 0
+  });
 
   const addVerticalSplit = () => {
     if (!Array.isArray(value)) {
@@ -24,8 +35,7 @@ export function VerticalSplitsArrayField({
     }
     const newSplit: VerticalSplit = {
       position: 12, // Default position in inches
-      direction: 'left-to-right',
-      horizontal_splits: []
+      direction: 'left-to-right'
     };
     onChange([...value, newSplit]);
   };
@@ -48,170 +58,96 @@ export function VerticalSplitsArrayField({
     ));
   };
 
-  const addHorizontalSplit = (verticalSplitIndex: number) => {
-    if (!Array.isArray(value)) {
-      console.error('Invalid value array in VerticalSplitsArrayField:', value);
-      return;
-    }
-    const newHorizontalSplit: HorizontalSplit = {
-      position: 12, // Default position in inches
-      direction: 'top-to-bottom'
-    };
-    
-    onChange(value.map((split, i) => 
-      i === verticalSplitIndex 
-        ? { ...split, horizontal_splits: [...split.horizontal_splits, newHorizontalSplit] }
-        : split
-    ));
-  };
-
-  const removeHorizontalSplit = (verticalSplitIndex: number, horizontalSplitIndex: number) => {
-    if (!Array.isArray(value)) {
-      console.error('Invalid value array in VerticalSplitsArrayField:', value);
-      return;
-    }
-    onChange(value.map((split, i) => 
-      i === verticalSplitIndex 
-        ? { ...split, horizontal_splits: split.horizontal_splits.filter((_, j) => j !== horizontalSplitIndex) }
-        : split
-    ));
-  };
-
-  const updateHorizontalSplit = (verticalSplitIndex: number, horizontalSplitIndex: number, field: keyof HorizontalSplit, newValue: any) => {
-    if (!Array.isArray(value)) {
-      console.error('Invalid value array in VerticalSplitsArrayField:', value);
-      return;
-    }
-    onChange(value.map((split, i) => 
-      i === verticalSplitIndex 
-        ? { 
-            ...split, 
-            horizontal_splits: split.horizontal_splits.map((h, j) => 
-              j === horizontalSplitIndex ? { ...h, [field]: newValue } : h
-            )
-          }
-        : split
-    ));
-  };
+  if (!editable) {
+    return (
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          {label}
+        </label>
+        
+        {!Array.isArray(value) || value.length === 0 ? (
+          <div className="text-sm text-gray-500 italic">No vertical splits defined</div>
+        ) : (
+          <div className="space-y-4">
+            {value.map((split, index) => (
+              <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                <div className="mb-2">
+                  <strong>Vertical Split {index + 1}:</strong> {split.position}" ({split.direction})
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-4 p-4 border rounded bg-gray-50">
-      <h4 className="font-medium text-gray-700">{label}</h4>
+    <div className="mb-4">
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        {label}
+      </label>
       
-      {/* Vertical splits */}
+      {(!Array.isArray(value) || value.length === 0) && (
+        <div className="text-center py-4 text-gray-500 text-sm">
+          No vertical splits defined
+        </div>
+      )}
+      
       {Array.isArray(value) && value.length > 0 && (
-        <div className="space-y-4">
-          {value.map((verticalSplit, vIndex) => (
-            <div key={vIndex} className="p-3 bg-white rounded border">
-              <div className="flex items-center justify-between mb-3">
-                <h5 className="font-medium text-sm">Vertical Split {vIndex + 1}</h5>
+        <div className="space-y-4 mb-4">
+          {value.map((split, index) => (
+            <div key={index} className="border rounded-lg p-4 bg-white">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="font-medium text-gray-800">Vertical Split {index + 1}</h4>
                 {editable && (
                   <button
                     type="button"
-                    onClick={() => removeVerticalSplit(vIndex)}
-                    className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+                    onClick={() => removeVerticalSplit(index)}
+                    className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
                   >
                     Remove
                   </button>
                 )}
               </div>
               
-              <div className="grid grid-cols-2 gap-3 mb-3">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-medium">Position (inches):</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Position (inches)
+                  </label>
                   <input
                     type="number"
                     step="0.125"
-                    value={verticalSplit.position || ''}
-                    onChange={(e) => updateVerticalSplit(vIndex, 'position', Number(e.target.value))}
+                    value={split.position}
+                    onChange={(e) => updateVerticalSplit(index, 'position', parseFloat(e.target.value) || 0)}
                     disabled={!editable}
-                    className="w-full px-2 py-1 border rounded text-sm"
+                    className="w-full px-3 py-2 border rounded-md"
                   />
                 </div>
+                
                 <div>
-                  <label className="text-xs font-medium">Direction:</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Direction
+                  </label>
                   <select
-                    value={verticalSplit.direction}
-                    onChange={(e) => updateVerticalSplit(vIndex, 'direction', e.target.value)}
+                    value={split.direction}
+                    onChange={(e) => updateVerticalSplit(index, 'direction', e.target.value)}
                     disabled={!editable}
-                    className="w-full px-2 py-1 border rounded text-sm"
+                    className="w-full px-3 py-2 border rounded-md"
                   >
                     <option value="left-to-right">Left to Right</option>
                     <option value="right-to-left">Right to Left</option>
                   </select>
                 </div>
               </div>
-
-              {/* Horizontal splits for this vertical split */}
-              <div className="ml-4 border-l-2 border-gray-200 pl-3">
-                <div className="flex items-center justify-between mb-2">
-                  <h6 className="text-xs font-medium text-gray-600">Horizontal Splits</h6>
-                  {editable && (
-                    <button
-                      type="button"
-                      onClick={() => addHorizontalSplit(vIndex)}
-                      className="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600"
-                    >
-                      Add Horizontal
-                    </button>
-                  )}
-                </div>
-
-                {verticalSplit.horizontal_splits.length > 0 ? (
-                  <div className="space-y-2">
-                    {verticalSplit.horizontal_splits.map((horizontalSplit, hIndex) => (
-                      <div key={hIndex} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-                        <span className="text-xs">H{hIndex + 1}:</span>
-                        
-                        <div className="flex items-center gap-1">
-                          <label className="text-xs">Pos:</label>
-                          <input
-                            type="number"
-                            step="0.125"
-                            value={horizontalSplit.position || ''}
-                            onChange={(e) => updateHorizontalSplit(vIndex, hIndex, 'position', Number(e.target.value))}
-                            disabled={!editable}
-                            className="w-16 px-1 py-1 border rounded text-xs"
-                          />
-                        </div>
-
-                        <div className="flex items-center gap-1">
-                          <label className="text-xs">Dir:</label>
-                          <select
-                            value={horizontalSplit.direction}
-                            onChange={(e) => updateHorizontalSplit(vIndex, hIndex, 'direction', e.target.value)}
-                            disabled={!editable}
-                            className="px-1 py-1 border rounded text-xs"
-                          >
-                            <option value="top-to-bottom">Top→Bottom</option>
-                            <option value="bottom-to-top">Bottom→Top</option>
-                          </select>
-                        </div>
-
-                        {editable && (
-                          <button
-                            type="button"
-                            onClick={() => removeHorizontalSplit(vIndex, hIndex)}
-                            className="px-1 py-1 bg-red-400 text-white rounded text-xs hover:bg-red-500"
-                          >
-                            ×
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-xs text-gray-500 italic">No horizontal splits</div>
-                )}
-              </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Add vertical split button */}
       {editable && (
-        <div className="text-center">
+        <div className="flex gap-3 justify-center">
           <button
             type="button"
             onClick={addVerticalSplit}
@@ -219,14 +155,19 @@ export function VerticalSplitsArrayField({
           >
             Add Vertical Split
           </button>
-        </div>
-      )}
-
-      {(!Array.isArray(value) || value.length === 0) && (
-        <div className="text-center py-4 text-gray-500 text-sm">
-          No vertical splits defined
+          
+          {showSaveButton && onSaveVerticalSplits && (
+            <button
+              type="button"
+              onClick={onSaveVerticalSplits}
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            >
+              Save Vertical Splits
+            </button>
+          )}
         </div>
       )}
     </div>
   );
 }
+
