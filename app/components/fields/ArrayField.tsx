@@ -55,6 +55,12 @@ export function ArrayField({
     onChange(newArray);
   };
 
+  const updateEntireItem = (index: number, updatedItem: any) => {
+    const newArray = [...value];
+    newArray[index] = updatedItem;
+    onChange(newArray);
+  };
+
   const toggleExpanded = (index: number) => {
     setExpandedItems(prev => {
       const newSet = new Set(prev);
@@ -77,6 +83,7 @@ export function ArrayField({
           value={item}
           editable={editable}
           onChange={(field: string, newValue: any) => updateItem(index, field, newValue)}
+          onUpdateWindow={(updatedWindow: any) => updateEntireItem(index, updatedWindow)}
           itemMeta={itemMeta}
         />
       );

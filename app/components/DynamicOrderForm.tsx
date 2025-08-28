@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { fieldComponentMap } from './fields';
 import { createSingleOrDoubleHungWindow } from '@/app/schemas/createSingleOrDoubleHungWindow';
+import { prepareOrderForDatabase } from '@/app/libs/orderProcessing';
 
 
 export function DynamicOrderForm({
@@ -19,7 +20,7 @@ export function DynamicOrderForm({
 
 	const [status, setStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
-	// 🔄 Utility: filter out group-only layers from path
+	// Filter out group-only layers from path
   const pruneMetaPath = (meta: any, fullPath: string): string => {
     const keys = fullPath.split('.');
     const truePath: string[] = [];
@@ -38,6 +39,22 @@ export function DynamicOrderForm({
 
     return truePath.join('.');
   };
+
+	const getNestedValue = (obj: any, path: string): any => {
+		const realPath = pruneMetaPath(orderMeta, path);
+		const keys = realPath.split('.');
+		let cursor = obj;
+
+		for (const key of keys) {
+			if (cursor && typeof cursor === 'object' && key in cursor) {
+				cursor = cursor[key];
+			} else {
+				return undefined;
+			}
+		}
+
+		return cursor;
+	};
 
 	const updateNestedField = (obj: any, path: string, value: any) => {
 		const realPath = pruneMetaPath(orderMeta, path);
@@ -112,10 +129,13 @@ export function DynamicOrderForm({
     setStatus('saving');
 
     try {
+      // Process order with extension calculations before saving
+      const processedOrder = prepareOrderForDatabase(order);
+
       const res = await fetch('/api/orders/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(order),
+        body: JSON.stringify(processedOrder),
       });
 
       const data = await res.json();
@@ -218,10 +238,6 @@ export function DynamicOrderForm({
       const label = fieldConfig.label || key;
       const type = fieldConfig.type;
 
-      console.log(`field is: ${key}`)
-      console.log(perms)
-      console.log(editable)
-
       const FieldComponent = fieldComponentMap[type];
 
       if (!FieldComponent) {
@@ -229,20 +245,50 @@ export function DynamicOrderForm({
         continue;
       }
 
-      fields.push(
-        <div key={`wrapper-${fullPath}`} className={padding}>
-          <FieldComponent
-            value={value}
-            editable={editable}
-            label={label}
-            options={fieldConfig.options}
-            onChange={(v: any) => {
-              const updated = updateNestedField(order, fullPath, v);
-              setOrder(updated);
-            }}
-          />
-        </div>
-      );
+      // Handling for vertical splits field to add Save functionality
+      if (type === 'vertical_splits_array') {
+        // Handle nested path for vertical_splits_saved
+        // Replace 'original_vertical_splits' with 'vertical_splits_saved' in the path
+        const verticalSplitsSavedPath = fullPath.replace('original_vertical_splits', 'vertical_splits_saved');
+        const isVerticalSplitsSaved = getNestedValue(order, verticalSplitsSavedPath);
+        
+        
+        fields.push(
+          <div key={`wrapper-${fullPath}`} className={padding}>
+            <FieldComponent
+              value={value}
+              editable={editable}
+              label={label}
+              options={fieldConfig.options}
+              showSaveButton={editable && !isVerticalSplitsSaved}
+              onSaveVerticalSplits={() => {
+                // Mark vertical splits as saved and trigger horizontal subsections generation
+                const updatedOrder = updateNestedField(order, verticalSplitsSavedPath, true);
+                setOrder(updatedOrder);
+              }}
+              onChange={(v: any) => {
+                const updated = updateNestedField(order, fullPath, v);
+                setOrder(updated);
+              }}
+            />
+          </div>
+        );
+      } else {
+        fields.push(
+          <div key={`wrapper-${fullPath}`} className={padding}>
+            <FieldComponent
+              value={value}
+              editable={editable}
+              label={label}
+              options={fieldConfig.options}
+              onChange={(v: any) => {
+                const updated = updateNestedField(order, fullPath, v);
+                setOrder(updated);
+              }}
+            />
+          </div>
+        );
+      }
 
 
     }

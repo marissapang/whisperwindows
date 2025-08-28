@@ -4,18 +4,23 @@ import { BooleanField } from './BooleanField';
 import { NumberInchesField } from './NumberInchesField';
 import { NumberDollarsField } from './NumberDollarsField';
 import { VerticalSplitsArrayField } from './VerticalSplitsArrayField';
+import { HorizontalSubsectionsArrayField } from './HorizontalSubsectionsArrayField';
+import { ExtensionConfigField } from './ExtensionConfigField';
 import { SelectField } from './SelectField';
 import { DateField } from './DateField';
 import { LongTextField } from './LongTextField';
 
 export const fieldComponentMap: Record<string, any> = {
   string: StringField,
-  number: NumberInchesField, // Use NumberInchesField for basic numbers too
+  array: ArrayField,
   bool: BooleanField,
+  number: NumberInchesField, // Use NumberInchesField for basic numbers too
+  integer: NumberInchesField,
   number_inches: NumberInchesField,
   number_dollars: NumberDollarsField,
   vertical_splits_array: VerticalSplitsArrayField,
-  array: ArrayField,
+  horizontal_subsections_array: HorizontalSubsectionsArrayField,
+  extension_config: ExtensionConfigField,
   select: SelectField,
   date: DateField,
   longtext: LongTextField

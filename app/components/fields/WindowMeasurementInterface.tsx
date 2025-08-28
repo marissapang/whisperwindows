@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { fieldComponentMap } from './index';
+import { calculateAndUpdateWindow } from '../../schemas/createSingleOrDoubleHungWindow';
 
 interface WindowMeasurementInterfaceProps {
   value: any;
   editable: boolean;
   onChange: (field: string, newValue: any) => void;
+  onUpdateWindow?: (updatedWindow: any) => void;
   itemMeta: any;
 }
 
@@ -14,6 +16,7 @@ export function WindowMeasurementInterface({
   value, 
   editable, 
   onChange, 
+  onUpdateWindow,
   itemMeta 
 }: WindowMeasurementInterfaceProps) {
   const [mode, setMode] = useState<'manual' | 'visual'>('visual');
@@ -216,9 +219,45 @@ export function WindowMeasurementInterface({
     );
   };
 
+  const handleSaveVerticalSplits = async () => {
+    if (!value) {
+      return;
+    }
+
+    try {
+      // Mark vertical splits as saved
+      const updatedWindow = {
+        ...value,
+        vertical_splits_saved: true
+      };
+      
+      // Check if we have vertical splits to generate subsections from
+      const hasVerticalSplits = updatedWindow.original_vertical_splits?.length > 0;
+      
+      if (!hasVerticalSplits) {
+        alert('No vertical splits found to save.');
+        return;
+      }
+      
+      // Calculate and update the window with horizontal subsections
+      const calculatedWindow = calculateAndUpdateWindow(updatedWindow);
+      
+      // Update the entire window object at once
+      if (onUpdateWindow) {
+        onUpdateWindow(calculatedWindow);
+      } else {
+        // Fallback to individual field updates
+        Object.entries(calculatedWindow).forEach(([field, fieldValue]) => {
+          onChange(field, fieldValue);
+        });
+      }
+    } catch (error) {
+      console.error('Error saving vertical splits:', error);
+    }
+  };
+
   const renderManualMode = () => {
     if (!itemMeta || typeof itemMeta !== 'object') {
-      console.error('itemMeta is invalid in WindowMeasurementInterface:', itemMeta);
       return <div className="text-red-500">Error: Window metadata not available</div>;
     }
 
@@ -231,9 +270,45 @@ export function WindowMeasurementInterface({
         
         const FieldComponent = fieldComponentMap[fieldConfig?.type];
         if (!FieldComponent) {
-          console.warn(`No field component registered for type: ${fieldConfig?.type}`);
           continue;
         }
+
+        // Special handling for vertical_splits_array field
+        if (fieldConfig?.type === 'vertical_splits_array') {
+          const showSaveButton = editable && 
+            !value?.vertical_splits_saved && 
+            value?.original_vertical_splits && 
+            value.original_vertical_splits.length > 0;
+          
+          fields.push(
+            <div key={key} className="mb-4">
+              <FieldComponent
+                value={value?.[key]}
+                editable={editable}
+                label={fieldConfig.label || key}
+                onChange={(newValue: any) => onChange(key, newValue)}
+                showSaveButton={showSaveButton}
+                onSaveVerticalSplits={handleSaveVerticalSplits}
+              />
+            </div>
+          );
+          continue;
+        }
+
+        // Pass window data context for extension_config fields
+        const fieldProps = fieldConfig?.type === 'extension_config' ? {
+          windowData: {
+            original_measurements: {
+              top: value?.['original_measurements.top'] || value?.original_measurements?.top || 0,
+              bottom: value?.['original_measurements.bottom'] || value?.original_measurements?.bottom || 0,
+              left: value?.['original_measurements.left'] || value?.original_measurements?.left || 0,
+              right: value?.['original_measurements.right'] || value?.original_measurements?.right || 0
+            },
+            original_vertical_splits: value?.original_vertical_splits || [],
+            original_horizontal_subsections: value?.original_horizontal_subsections || [],
+            calculated_horizontal_subsections: value?.calculated_horizontal_subsections || []
+          }
+        } : {};
 
         fields.push(
           <div key={key} className="mb-4">
@@ -242,12 +317,12 @@ export function WindowMeasurementInterface({
               editable={editable}
               label={fieldConfig.label || key}
               onChange={(newValue: any) => onChange(key, newValue)}
+              {...fieldProps}
             />
           </div>
         );
       }
     } catch (error) {
-      console.error('Error rendering manual mode fields:', error);
       return <div className="text-red-500">Error rendering window fields</div>;
     }
 
