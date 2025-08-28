@@ -5,7 +5,7 @@ const FRAME_CONFIGURATIONS = [
 const FRAME_CONFIGURATIONS_META = {
   "full-top": {
     "label": "Full Top Piece",
-    "drawing-link": "future file path for diagram"
+    "diagram-link": "future file path for diagram"
   }, 
 }
 
@@ -34,7 +34,7 @@ const FRAMING_MATERIALS_META = {
     max_length: 8*12
   },
   "primed_pine1x6":{
-    name:"Primed Pine 1x6"
+    name:"Primed Pine 1x6",
     width: 5.75,
     thickness: 3/4,
     preferred_length: 8*12,
@@ -56,5 +56,8 @@ const FRAME_MOUNTING_DIRECTIONS = ["Width Is Front-Facing", "Thickness Is Front-
 // 3. calculate the lengths of the frame pieces used for the metal tape / panels 
 
 
-
+// output for 8/20
+// calculateFrameCutSheet
+// - inputs: T, B, L, R measurement | configuration | material type
+// - output: Top, B, L, R length of specific materials to cut & new effective window size and vert + horizontal middle split sizes
 
