@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { fieldComponentMap } from './fields';
-import { createSingleOrDoubleHungWindow } from '@/app/schemas/createSingleOrDoubleHungWindow';
-import { prepareOrderForDatabase } from '@/app/libs/orderProcessing';
+import { createSingleOrDoubleHungWindow } from './schemas/createSingleOrDoubleHungWindow';
+import { prepareOrderForDatabase } from './libs/orderProcessing';
 
 
 export function DynamicOrderForm({

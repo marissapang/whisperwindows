@@ -8,7 +8,7 @@ import {
   calculateExtensionResults,
   type WindowMeasurements,
   type VerticalSplit
-} from '../../schemas/comprehensiveExtensionSchema';
+} from '../schemas/comprehensiveExtensionSchema';
 
 interface ExtensionConfigFieldProps {
   value: ExtensionConfig;

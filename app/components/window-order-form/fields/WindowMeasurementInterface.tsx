@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { fieldComponentMap } from './index';
-import { calculateAndUpdateWindow } from '../../schemas/createSingleOrDoubleHungWindow';
+import { calculateAndUpdateWindow } from '../schemas/createSingleOrDoubleHungWindow';
 
 interface WindowMeasurementInterfaceProps {
   value: any;

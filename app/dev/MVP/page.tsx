@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { createBlankOrder, orderMeta } from "@/app/schemas/createBlankOrder"; // adjust as needed
-import { DynamicOrderForm } from "@/app/components/DynamicOrderForm";
+import { createBlankOrder, orderMeta } from "@/app/components/window-order-form/schemas/createBlankOrder"; // adjust as needed
+import { DynamicOrderForm } from "@/app/components/window-order-form/DynamicOrderForm";
 
 type OrderState =
   | {
