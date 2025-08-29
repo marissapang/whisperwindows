@@ -4,13 +4,27 @@ import { useState } from 'react';
 import { fieldComponentMap } from './index';
 import { WindowMeasurementInterface } from './WindowMeasurementInterface';
 
+// Basic item structure that all array items should have
+interface ArrayItem {
+  Order_Position?: number;
+  Window_Type?: string;
+  [key: string]: unknown;
+}
+
+// Field configuration structure
+interface FieldConfig {
+  type: string;
+  label?: string;
+  [key: string]: unknown;
+}
+
 interface ArrayFieldProps {
-  value: any[];
+  value: ArrayItem[];
   editable: boolean;
   label: string;
-  itemMeta: any;
-  onChange: (newArray: any[]) => void;
-  createNewItem: () => any;
+  itemMeta: Record<string, FieldConfig>;
+  onChange: (newArray: ArrayItem[]) => void;
+  createNewItem: () => ArrayItem;
 }
 
 export function ArrayField({ 
@@ -49,13 +63,13 @@ export function ArrayField({
     });
   };
 
-  const updateItem = (index: number, field: string, newValue: any) => {
+  const updateItem = (index: number, field: string, newValue: unknown) => {
     const newArray = [...value];
     newArray[index] = { ...newArray[index], [field]: newValue };
     onChange(newArray);
   };
 
-  const updateEntireItem = (index: number, updatedItem: any) => {
+  const updateEntireItem = (index: number, updatedItem: ArrayItem) => {
     const newArray = [...value];
     newArray[index] = updatedItem;
     onChange(newArray);
@@ -73,7 +87,7 @@ export function ArrayField({
     });
   };
 
-  const renderItemFields = (item: any, index: number) => {
+  const renderItemFields = (item: ArrayItem, index: number) => {
     const fields: JSX.Element[] = [];
     
     // Check if this is a window item and use the special interface
@@ -82,8 +96,8 @@ export function ArrayField({
         <WindowMeasurementInterface
           value={item}
           editable={editable}
-          onChange={(field: string, newValue: any) => updateItem(index, field, newValue)}
-          onUpdateWindow={(updatedWindow: any) => updateEntireItem(index, updatedWindow)}
+          onChange={(field: string, newValue: unknown) => updateItem(index, field, newValue)}
+          onUpdateWindow={(updatedWindow: ArrayItem) => updateEntireItem(index, updatedWindow)}
           itemMeta={itemMeta}
         />
       );
@@ -91,7 +105,7 @@ export function ArrayField({
     
     // Default rendering for non-window items
     for (const [key, config] of Object.entries(itemMeta)) {
-      const fieldConfig = config as any;
+      const fieldConfig = config as FieldConfig;
       const FieldComponent = fieldComponentMap[fieldConfig.type];
       
       if (!FieldComponent) continue;
@@ -102,7 +116,7 @@ export function ArrayField({
             value={item[key]}
             editable={editable}
             label={fieldConfig.label || key}
-            onChange={(newValue: any) => updateItem(index, key, newValue)}
+            onChange={(newValue: unknown) => updateItem(index, key, newValue)}
           />
         </div>
       );

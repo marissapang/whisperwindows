@@ -7,8 +7,29 @@ import {
   type ExtensionConfigurationType,
   calculateExtensionResults,
   type WindowMeasurements,
-  type VerticalSplit
+  type VerticalSplit,
+  type FramePiece,
+  type CalculatedMeasurements,
+  type CutListItem
 } from '../schemas/comprehensiveExtensionSchema';
+
+// Define calculation results interface - can be either success or error state
+type CalculationResults = {
+  workingMeasurements: CalculatedMeasurements;
+  calculatedSplits: VerticalSplit[];
+  effectiveDimensions: { width: number; height: number };
+  framePieces: Record<string, FramePiece>;
+  cutList: CutListItem[];
+  thicknessVector: Record<string, number>;
+  calculationSummary: {
+    extension_type?: string;
+    configuration_used?: string;
+    transformation_applied?: boolean;
+    [key: string]: unknown;
+  };
+} | {
+  error: string;
+};
 
 interface ExtensionConfigFieldProps {
   value: ExtensionConfig;
@@ -18,15 +39,15 @@ interface ExtensionConfigFieldProps {
   windowData?: {
     original_measurements: WindowMeasurements;
     original_vertical_splits: VerticalSplit[];
-    original_horizontal_subsections?: any[];
-    calculated_horizontal_subsections?: any[];
+    original_horizontal_subsections?: unknown[];
+    calculated_horizontal_subsections?: unknown[];
   };
 }
 
 export function ExtensionConfigField({ value, onChange, label, name, windowData }: ExtensionConfigFieldProps) {
   const [config, setConfig] = useState<ExtensionConfig>(value);
   const [showCalculations, setShowCalculations] = useState(false);
-  const [calculationResults, setCalculationResults] = useState<any>(null);
+  const [calculationResults, setCalculationResults] = useState<CalculationResults | null>(null);
 
   useEffect(() => {
     setConfig(value);
@@ -260,7 +281,7 @@ export function ExtensionConfigField({ value, onChange, label, name, windowData 
           </div>
           
           <div className="p-4 space-y-4">
-            {calculationResults?.error ? (
+            {'error' in calculationResults ? (
               <div className="bg-red-50 border border-red-200 rounded-md p-3">
                 <p className="text-red-800 text-sm">{calculationResults.error}</p>
               </div>
@@ -270,10 +291,10 @@ export function ExtensionConfigField({ value, onChange, label, name, windowData 
                 <div className="bg-blue-50 rounded-md p-3">
                   <h5 className="font-medium text-blue-900 mb-2">Panel Measurements</h5>
                   <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div>Top: <span>{calculationResults.workingMeasurements?.top}"</span></div>
-                    <div>Bottom: <span>{calculationResults.workingMeasurements?.bottom}"</span></div>
-                    <div>Left: <span>{calculationResults.workingMeasurements?.left}"</span></div>
-                    <div>Right: <span>{calculationResults.workingMeasurements?.right}"</span></div>
+                    <div>Top: <span>{calculationResults.workingMeasurements.top}"</span></div>
+                    <div>Bottom: <span>{calculationResults.workingMeasurements.bottom}"</span></div>
+                    <div>Left: <span>{calculationResults.workingMeasurements.left}"</span></div>
+                    <div>Right: <span>{calculationResults.workingMeasurements.right}"</span></div>
                   </div>
                 </div>
 
@@ -281,8 +302,8 @@ export function ExtensionConfigField({ value, onChange, label, name, windowData 
                 <div className="bg-green-50 rounded-md p-3">
                   <h5 className="font-medium text-green-900 mb-2">Interior Opening</h5>
                   <div className="text-sm">
-                    <div>Width: <span>{calculationResults.effectiveDimensions?.width}"</span></div>
-                    <div>Height: <span>{calculationResults.effectiveDimensions?.height}"</span></div>
+                    <div>Width: <span>{calculationResults.effectiveDimensions.width}"</span></div>
+                    <div>Height: <span>{calculationResults.effectiveDimensions.height}"</span></div>
                   </div>
                 </div>
 
@@ -290,7 +311,7 @@ export function ExtensionConfigField({ value, onChange, label, name, windowData 
                 <div className="bg-amber-50 rounded-md p-3">
                   <h5 className="font-medium text-amber-900 mb-2">Cut Lengths</h5>
                   <div className="grid grid-cols-2 gap-2 text-sm">
-                    {Object.entries(calculationResults.framePieces || {}).map(([key, piece]: [string, any]) => (
+                    {Object.entries(calculationResults.framePieces || {}).map(([key, piece]: [string, FramePiece]) => (
                       <div key={key}>
                         <span className="capitalize">{piece.material_side}: </span>
                         <span>{piece.length}"</span>
@@ -313,11 +334,11 @@ export function ExtensionConfigField({ value, onChange, label, name, windowData 
                 </div>
 
                 {/* Vertical Split Recalculation */}
-                {calculationResults.calculatedSplits && calculationResults.calculatedSplits.length > 0 && (
+                {calculationResults.calculatedSplits.length > 0 && (
                   <div className="bg-indigo-50 rounded-md p-3">
                     <h5 className="font-medium text-indigo-900 mb-2">Vertical Split Positions</h5>
                     <div className="grid grid-cols-2 gap-2 text-sm">
-                      {calculationResults.calculatedSplits.map((split: any, index: number) => (
+                      {calculationResults.calculatedSplits.map((split: VerticalSplit, index: number) => (
                         <div key={index}>
                           Split {index + 1}: <span>{split.position}"</span>
                         </div>
@@ -331,9 +352,9 @@ export function ExtensionConfigField({ value, onChange, label, name, windowData 
                 <div className="bg-gray-50 rounded-md p-3">
                   <h5 className="font-medium text-gray-900 mb-2">Configuration</h5>
                   <div className="text-sm space-y-1">
-                    <div>Type: <span className="font-medium capitalize">{calculationResults.calculationSummary?.extension_type}</span></div>
-                    <div>Pattern: <span className="font-medium">{calculationResults.calculationSummary?.configuration_used}</span></div>
-                    <div>Transformation: <span className="font-medium">{calculationResults.calculationSummary?.transformation_applied ? 'Applied' : 'None'}</span></div>
+                    <div>Type: <span className="font-medium capitalize">{calculationResults.calculationSummary.extension_type}</span></div>
+                    <div>Pattern: <span className="font-medium">{calculationResults.calculationSummary.configuration_used}</span></div>
+                    <div>Transformation: <span className="font-medium">{calculationResults.calculationSummary.transformation_applied ? 'Applied' : 'None'}</span></div>
                   </div>
                 </div>
               </>
