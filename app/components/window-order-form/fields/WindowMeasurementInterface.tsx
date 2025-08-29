@@ -4,12 +4,60 @@ import { useState, useEffect } from 'react';
 import { fieldComponentMap } from './index';
 import { calculateAndUpdateWindow } from '../schemas/createSingleOrDoubleHungWindow';
 
+interface WindowMeasurements {
+  width_top_outside?: number | null;
+  width_top_inside?: number | null;
+  width_bottom_outside?: number | null;
+  width_bottom_inside?: number | null;
+  height_left_outside?: number | null;
+  height_left_inside?: number | null;
+  height_right_outside?: number | null;
+  height_right_inside?: number | null;
+  height_middle?: number | null;
+}
+
+interface DiagramDimensions {
+  svgWidth: number;
+  svgHeight: number;
+  scale: number;
+  padding: number;
+  outerFrame: { x: number; y: number; width: number; height: number };
+  upperSash: { x: number; y: number; width: number; height: number };
+  lowerSash: { x: number; y: number; width: number; height: number };
+  frameThickness: number;
+}
+
+interface FieldConfig {
+  type: string;
+  label?: string;
+  omit?: boolean;
+  [key: string]: any;
+}
+
+interface WindowData {
+  vertical_splits_saved?: boolean;
+  original_vertical_splits?: any[];
+  original_horizontal_subsections?: any[];
+  calculated_horizontal_subsections?: any[];
+  original_measurements?: {
+    top?: number;
+    bottom?: number;
+    left?: number;
+    right?: number;
+  };
+  'original_measurements.top'?: number;
+  'original_measurements.bottom'?: number;
+  'original_measurements.left'?: number;
+  'original_measurements.right'?: number;
+  [key: string]: any;
+}
+
 interface WindowMeasurementInterfaceProps {
-  value: any;
+  value: WindowData;
   editable: boolean;
-  onChange: (field: string, newValue: any) => void;
-  onUpdateWindow?: (updatedWindow: any) => void;
-  itemMeta: any;
+  onChange: (field: string, newValue: unknown) => void;
+  onUpdateWindow?: (updatedWindow: WindowData) => void;
+  itemMeta: Record<string, FieldConfig>;
 }
 
 export function WindowMeasurementInterface({ 
@@ -26,7 +74,7 @@ export function WindowMeasurementInterface({
   const staticHeight = 400;
   
   // Applied measurements (used for diagram rendering when measurements exist)
-  const [appliedMeasurements, setAppliedMeasurements] = useState({
+  const [appliedMeasurements, setAppliedMeasurements] = useState<WindowMeasurements>({
     width_top_outside: value?.width_top_outside || null,
     width_top_inside: value?.width_top_inside || null,
     width_bottom_outside: value?.width_bottom_outside || null,
@@ -39,7 +87,7 @@ export function WindowMeasurementInterface({
   });
 
   // Pending measurements (temporary state before applying)
-  const [pendingMeasurements, setPendingMeasurements] = useState({
+  const [pendingMeasurements, setPendingMeasurements] = useState<WindowMeasurements>({
     width_top_outside: value?.width_top_outside || null,
     width_top_inside: value?.width_top_inside || null,
     width_bottom_outside: value?.width_bottom_outside || null,
@@ -59,7 +107,7 @@ export function WindowMeasurementInterface({
 
   // Update pending measurements when value prop changes
   useEffect(() => {
-    const newMeasurements = {
+    const newMeasurements: WindowMeasurements = {
       width_top_outside: value?.width_top_outside || null,
       width_top_inside: value?.width_top_inside || null,
       width_bottom_outside: value?.width_bottom_outside || null,
@@ -75,7 +123,7 @@ export function WindowMeasurementInterface({
   }, [value]);
 
   // Calculate dynamic dimensions only if we have measurements
-  const getDiagramDimensions = () => {
+  const getDiagramDimensions = (): DiagramDimensions => {
     if (!hasMeasurements) {
       // Return static clean diagram
       return {
@@ -139,7 +187,7 @@ export function WindowMeasurementInterface({
 
   const dimensions = getDiagramDimensions();
 
-  const handlePendingMeasurementChange = (field: string, newValue: number) => {
+  const handlePendingMeasurementChange = (field: keyof WindowMeasurements, newValue: number) => {
     setPendingMeasurements(prev => ({
       ...prev,
       [field]: newValue || null
@@ -160,14 +208,16 @@ export function WindowMeasurementInterface({
     setPendingMeasurements({ ...appliedMeasurements });
   };
 
-  const MeasurementInput = ({ field, label, x, y, orientation = 'horizontal' }: {
-    field: string;
+  interface MeasurementInputProps {
+    field: keyof WindowMeasurements;
     label: string;
     x: number;
     y: number;
     orientation?: 'horizontal' | 'vertical';
-  }) => {
-    const currentValue = pendingMeasurements[field as keyof typeof pendingMeasurements];
+  }
+
+  const MeasurementInput = ({ field, label, x, y, orientation = 'horizontal' }: MeasurementInputProps) => {
+    const currentValue = pendingMeasurements[field];
     
     return (
       <g>
@@ -240,7 +290,7 @@ export function WindowMeasurementInterface({
       }
       
       // Calculate and update the window with horizontal subsections
-      const calculatedWindow = calculateAndUpdateWindow(updatedWindow);
+      const calculatedWindow = calculateAndUpdateWindow(updatedWindow as any);
       
       // Update the entire window object at once
       if (onUpdateWindow) {
@@ -265,7 +315,7 @@ export function WindowMeasurementInterface({
     
     try {
       for (const [key, config] of Object.entries(itemMeta)) {
-        const fieldConfig = config as any;
+        const fieldConfig = config as FieldConfig;
         if (fieldConfig?.omit) continue;
         
         const FieldComponent = fieldComponentMap[fieldConfig?.type];
@@ -286,7 +336,7 @@ export function WindowMeasurementInterface({
                 value={value?.[key]}
                 editable={editable}
                 label={fieldConfig.label || key}
-                onChange={(newValue: any) => onChange(key, newValue)}
+                onChange={(newValue: unknown) => onChange(key, newValue)}
                 showSaveButton={showSaveButton}
                 onSaveVerticalSplits={handleSaveVerticalSplits}
               />
@@ -316,7 +366,7 @@ export function WindowMeasurementInterface({
               value={value?.[key]}
               editable={editable}
               label={fieldConfig.label || key}
-              onChange={(newValue: any) => onChange(key, newValue)}
+              onChange={(newValue: unknown) => onChange(key, newValue)}
               {...fieldProps}
             />
           </div>
