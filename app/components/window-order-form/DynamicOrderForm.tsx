@@ -1,63 +1,78 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { fieldComponentMap } from './fields';
 import { createSingleOrDoubleHungWindow } from './schemas/createSingleOrDoubleHungWindow';
 import { prepareOrderForDatabase } from './libs/orderProcessing';
 
+type Role = 'Client' | 'Sales' | 'Manufacturer' | 'Installer';
+type FormStatus = 'idle' | 'saving' | 'success' | 'error';
+
+interface FieldConfig {
+  type: string;
+  label?: string;
+  style?: string;
+  options?: Array<{ value: string | number; label: string }>;
+  fields?: Record<string, FieldConfig>;
+  itemMeta?: FieldConfig;
+  fields_permissions?: {
+    visibleTo: Role[];
+    editableBy: Role[];
+    readOnlyStages: string[];
+  };
+}
+
+type OrderState = Record<string, unknown>;
+
+interface DynamicOrderFormProps {
+  order: OrderState;
+  orderMeta: Record<string, FieldConfig>;
+  setOrder: (order: OrderState | ((prevOrder: OrderState) => OrderState)) => void;
+  view: Role;
+}
 
 export function DynamicOrderForm({
 	order,
 	orderMeta,
 	setOrder,
 	view,
-}: {
-	order: any;
-	orderMeta: any;
-	setOrder: (o: any) => void;
-	view: 'Client' | 'Sales' | 'Manufacturer' | 'Installer';
-}) {
+}: DynamicOrderFormProps) {
 
-	const [status, setStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
+	const [status, setStatus] = useState<FormStatus>('idle');
 
 	// Filter out group-only layers from path
-  const pruneMetaPath = (meta: any, fullPath: string): string => {
-    const keys = fullPath.split('.');
-    const truePath: string[] = [];
-    let cursorMeta = meta;
+  const pruneMetaPath = (meta: Record<string, FieldConfig> | undefined, fullPath: string): string | null => {
+    if (!meta || !fullPath) return null;
 
-    for (const key of keys) {
-      const field = cursorMeta?.[key];
-      if (!field) break;
+    try {
+      const keys = fullPath.split('.');
+      const truePath: string[] = [];
+      let cursorMeta = meta;
 
-      if (field.type !== 'group') {
-        truePath.push(key);
+      for (const key of keys) {
+        if (!cursorMeta) break;
+
+        const field = cursorMeta[key];
+        if (!field) break;
+
+        if (field.type !== 'group') {
+          truePath.push(key);
+        }
+
+        cursorMeta = field.fields || {};
       }
 
-      cursorMeta = field.fields || {};
+      return truePath.length > 0 ? truePath.join('.') : null;
+    } catch (error) {
+      console.error('Error in pruneMetaPath:', error);
+      return null;
     }
-
-    return truePath.join('.');
   };
 
-	const getNestedValue = (obj: any, path: string): any => {
+
+	const updateNestedField = <T extends Record<string, unknown>>(obj: T, path: string, value: unknown): T => {
 		const realPath = pruneMetaPath(orderMeta, path);
-		const keys = realPath.split('.');
-		let cursor = obj;
-
-		for (const key of keys) {
-			if (cursor && typeof cursor === 'object' && key in cursor) {
-				cursor = cursor[key];
-			} else {
-				return undefined;
-			}
-		}
-
-		return cursor;
-	};
-
-	const updateNestedField = (obj: any, path: string, value: any) => {
-		const realPath = pruneMetaPath(orderMeta, path);
+		if (!realPath) return obj;
 		const keys = realPath.split('.');
 		const updated = { ...obj };
 		let cursor: any = updated;
@@ -250,7 +265,7 @@ export function DynamicOrderForm({
         // Handle nested path for vertical_splits_saved
         // Replace 'original_vertical_splits' with 'vertical_splits_saved' in the path
         const verticalSplitsSavedPath = fullPath.replace('original_vertical_splits', 'vertical_splits_saved');
-        const isVerticalSplitsSaved = getNestedValue(order, verticalSplitsSavedPath);
+        const isVerticalSplitsSaved = getValueByPath(order, verticalSplitsSavedPath);
         
         
         fields.push(
