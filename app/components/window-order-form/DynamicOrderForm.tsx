@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { fieldComponentMap } from './fields';
-import { createWindowObject } from './schemas/createWindowObject';
+import { createBlankWindowObject } from './schemas/createWindowObject';
 import { prepareOrderForDatabase } from './libs/orderProcessing';
 
 
@@ -205,7 +205,7 @@ export function DynamicOrderForm({
         // Determine the create function based on the array content
         let createNewItem = () => ({});
         if (key === 'Windows' && fieldConfig.itemMeta) {
-          createNewItem = createWindowObject;
+          createNewItem = createBlankWindowObject;
         }
         
         const WindowObjectArrayContainer = fieldComponentMap['window_object_array'];

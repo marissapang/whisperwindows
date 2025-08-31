@@ -37,7 +37,7 @@ interface ValidationResult {
 }
 
 // Function to normalize form data to expected structure
-function normalizeWindowData(window: RawWindowData): SingleOrDoubleHungWindow {
+function normalizeWindowData(window: RawWindowData): WindowObject {
   // Handle dot notation fields from form
   const normalized = { ...window };
   
@@ -98,7 +98,7 @@ function normalizeWindowData(window: RawWindowData): SingleOrDoubleHungWindow {
   delete normalized['thickness_vector.head_depth'];
   delete normalized['thickness_vector.casing_depth'];
   
-  return normalized as SingleOrDoubleHungWindow;
+  return normalized as WindowObject;
 }
 
 // Function to process and calculate all windows in an order

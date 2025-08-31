@@ -91,7 +91,7 @@ export function WindowObjectArrayContainer({
     const fields: JSX.Element[] = [];
     
     // Check if this is a window item and use the special interface
-    if (item.Window_Type === 'Single/Double Hung Window' || label.toLowerCase().includes('window')) {
+    if (item.Window_Type === 'Window' || label.toLowerCase().includes('window')) {
       return (
         <WindowMeasurementInterface
           value={item}

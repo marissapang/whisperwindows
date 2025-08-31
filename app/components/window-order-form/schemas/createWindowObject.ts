@@ -15,26 +15,14 @@ import {
   MATERIAL_THICKNESS
 } from './comprehensiveExtensionSchema';
 
-// helper functions
-function generateWindowId(n=6){
-	const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-	const window_id = customAlphabet(alphabet, 6)()
-	console.log(`window id is ${window_id}`)
-	return window_id; 
-}
-
-export function generateSplitId(n=6){
-	const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-	const split_id = customAlphabet(alphabet, 6)()
-	return split_id; 
-}
 
 // Re-export types from comprehensive schema
 export type { ExtensionConfig, VerticalSplit, HorizontalSplit, WindowMeasurements, CalculatedMeasurements, FramePiece, CutListItem };
 
+
 export interface WindowObject {
-	Window_Id: string;
-	Window_Type: 'Single/Double Hung Window';
+	Window_Name: string;
+	Window_Configuration: string;
 	Order_Position: number;
 	
 	// === ORIGINAL INPUT DATA (Never Modified) ===
@@ -80,10 +68,10 @@ export interface WindowObject {
 	};
 }
 
-export function createWindowObject(): WindowObject {
+export function createBlankWindowObject(): WindowObject {
 	return {
-		Window_Id: generateWindowId(),
-		Window_Type: 'Single/Double Hung Window',
+		Window_Name: '',
+		Window_Configuration: '',
 		Order_Position: 1,
 		
 		// Original input data
@@ -166,7 +154,7 @@ export function createWindowObject(): WindowObject {
 }
 
 // Function to calculate and update window with extension results
-export function calculateAndUpdateWindow(window: SingleOrDoubleHungWindow): SingleOrDoubleHungWindow {
+export function calculateAndUpdateWindow(window: WindowObject): WindowObject {
 	try {
 		// Check if we have valid measurements for extension calculations
 		// Access measurements using both dot notation and nested object notation
@@ -296,15 +284,16 @@ export function calculateAndUpdateWindow(window: SingleOrDoubleHungWindow): Sing
 }
 
 const windowMeta = {
-	Window_Id: {
+
+	Window_Name: {
 		'type': 'string',
-		'label': "Window ID", 
-		'omit': true // Auto-generated
+		'label': "Window Name", 
+		'omit': false 
 	},
-	Window_Type: {
+	Window_Configuration: {
 		'type': 'string',
-		'label': "Window Type", 
-		'omit': true // Fixed value
+		'label': "Window Configuration", 
+		'omit': false 
 	},
 	Order_Position: {
 		'type': 'integer',
