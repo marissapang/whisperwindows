@@ -1,4 +1,4 @@
-import { calculateAndUpdateWindow, type SingleOrDoubleHungWindow } from '../schemas/createSingleOrDoubleHungWindow';
+import { calculateAndUpdateWindow, type WindowObject } from '../schemas/createWindowObject';
 
 interface RawWindowData {
   'original_measurements.top'?: string | number;

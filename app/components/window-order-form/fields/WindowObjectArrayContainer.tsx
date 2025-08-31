@@ -27,7 +27,7 @@ interface ArrayFieldProps {
   createNewItem: () => ArrayItem;
 }
 
-export function ArrayField({ 
+export function WindowObjectArrayContainer({ 
   value = [], 
   editable, 
   label, 

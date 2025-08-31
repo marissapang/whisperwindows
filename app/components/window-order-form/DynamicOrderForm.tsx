@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { fieldComponentMap } from './fields';
-import { createSingleOrDoubleHungWindow } from './schemas/createSingleOrDoubleHungWindow';
+import { createWindowObject } from './schemas/createWindowObject';
 import { prepareOrderForDatabase } from './libs/orderProcessing';
 
 
@@ -194,7 +194,7 @@ export function DynamicOrderForm({
         continue;
       }
 
-      if (fieldConfig.type === 'array') {
+      if (fieldConfig.type === 'window_object_array') {
         const perms = resolvePermissions(fullPath, orderMeta);
         if (!perms.visibleTo.includes(view)) {
           continue;
@@ -205,13 +205,13 @@ export function DynamicOrderForm({
         // Determine the create function based on the array content
         let createNewItem = () => ({});
         if (key === 'Windows' && fieldConfig.itemMeta) {
-          createNewItem = createSingleOrDoubleHungWindow;
+          createNewItem = createWindowObject;
         }
         
-        const ArrayFieldComponent = fieldComponentMap['array'];
+        const WindowObjectArrayContainer = fieldComponentMap['window_object_array'];
         fields.push(
           <div key={fullPath} className={`mt-4 mb-2 ${padding}`}>
-            <ArrayFieldComponent
+            <WindowObjectArrayContainer
               value={value || []}
               editable={editable}
               label={fieldConfig.label || key}
