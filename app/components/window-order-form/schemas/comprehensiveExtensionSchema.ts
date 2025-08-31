@@ -19,14 +19,14 @@ export type ExtensionConfigurationType =
   | 'full-bottom';
 
 // Window measurements interface
-export interface WindowMeasurements {
+export interface FourSidedValues {
   top: number;     // Width measurement at top
   bottom: number;  // Width measurement at bottom
   left: number;    // Height measurement on left
   right: number;   // Height measurement on right
 }
 
-export interface CalculatedMeasurements extends WindowMeasurements {
+export interface CalculatedMeasurements extends FourSidedValues {
   transformation_applied: boolean;
   transformation_type: 'interior' | 'exterior' | null;
 }
@@ -99,7 +99,7 @@ export interface SingleOrDoubleHungWindow {
   Window_Type: 'Single/Double Hung Window';
   Order_Position: number;
   
-  original_measurements: WindowMeasurements;
+  original_measurements: FourSidedValues;
   original_vertical_splits: VerticalSplit[];
   original_horizontal_subsections: HorizontalSplitSubsection[];
   vertical_splits_saved: boolean;
@@ -274,7 +274,7 @@ export function generateEmptySingleOrDoubleHungWindow(): SingleOrDoubleHungWindo
 
 // 5. Validation Functions
 
-export function validateWindowMeasurements(measurements: WindowMeasurements): { isValid: boolean; errors: string[] } {
+export function validateWindowMeasurements(measurements: FourSidedValues): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
   
   if (!measurements.top || measurements.top <= 0) {
@@ -374,7 +374,7 @@ export function calculateThicknessVector(extensionConfig: ExtensionConfig): Reco
 }
 
 export function calculateWorkingMeasurements(
-  originalMeasurements: WindowMeasurements,
+  originalMeasurements: FourSidedValues,
   extensionConfig: ExtensionConfig,
   thicknessVector: Record<string, number>
 ): CalculatedMeasurements {
@@ -779,7 +779,7 @@ export function calculateAdjustedHorizontalSubsections(
 }
 
 export function calculateExtensionResults(
-  originalMeasurements: WindowMeasurements,
+  originalMeasurements: FourSidedValues,
   originalSplits: VerticalSplit[],
   extensionConfig: ExtensionConfig
 ): {
