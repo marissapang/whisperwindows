@@ -19,14 +19,23 @@ export type ExtensionConfigurationType =
   | 'full-bottom';
 
 // Window measurements interface
-export interface FourSidedValues {
-  top: number;     // Width measurement at top
-  bottom: number;  // Width measurement at bottom
-  left: number;    // Height measurement on left
-  right: number;   // Height measurement on right
+export interface FourSidedMeasurements {
+  top: number | null;     // Width measurement at top
+  bottom: number | null;  // Width measurement at bottom
+  left: number | null;    // Height measurement on left
+  right: number  | null;   // Height measurement on right
 }
 
-export interface CalculatedMeasurements extends FourSidedValues {
+export function createEmptyFourSidedMeasurements(): FourSidedMeasurements {
+  return ({
+    top: null,
+    bottom: null,
+    left: null,
+    right: null
+  })  
+};
+
+export interface CalculatedMeasurements extends FourSidedMeasurements {
   transformation_applied: boolean;
   transformation_type: 'interior' | 'exterior' | null;
 }
@@ -35,26 +44,26 @@ export interface CalculatedMeasurements extends FourSidedValues {
 export interface VerticalSplit {
   position: number;                           // Position in inches from LEFT edge
   direction: 'left-to-right' | 'right-to-left';
-  // Calculation tracking
-  original_position?: number;
-  position_adjustment?: number;
+  // // Calculation tracking
+  // original_position?: number;
+  // position_adjustment?: number;
 }
 
 export interface HorizontalSplit {
   position: number;                           // Position in inches from TOP edge
-  direction: 'top-to-bottom' | 'bottom-to-top';
-  // Calculation tracking
-  original_position?: number;
-  position_adjustment?: number;
+  direction: 'bottom-to-top' | 'top-to-bottom';
+  // // Calculation tracking
+  // original_position?: number;
+  // position_adjustment?: number;
 }
 
-// New interface for horizontal splits organized by window subsections
-export interface HorizontalSplitSubsection {
-  subsection_label: string;                   // "Left to Split 1", "Split 1 to Split 2", "Split 2 to Right"
-  left_boundary: number;                      // Left boundary position (in left-to-right coordinates)
-  right_boundary: number;                     // Right boundary position (in left-to-right coordinates)
-  horizontal_splits: HorizontalSplit[];       // Horizontal splits within this subsection
-}
+// // New interface for horizontal splits organized by window subsections
+// export interface HorizontalSplitSubsection {
+//   subsection_label: string;                   // "Left to Split 1", "Split 1 to Split 2", "Split 2 to Right"
+//   left_boundary: number;                      // Left boundary position (in left-to-right coordinates)
+//   right_boundary: number;                     // Right boundary position (in left-to-right coordinates)
+//   horizontal_splits: HorizontalSplit[];       // Horizontal splits within this subsection
+// }
 
 // Extension configuration interface
 export interface ExtensionConfig {
@@ -99,7 +108,7 @@ export interface SingleOrDoubleHungWindow {
   Window_Type: 'Single/Double Hung Window';
   Order_Position: number;
   
-  original_measurements: FourSidedValues;
+  original_measurements: FourSidedMeasurements;
   original_vertical_splits: VerticalSplit[];
   original_horizontal_subsections: HorizontalSplitSubsection[];
   vertical_splits_saved: boolean;
@@ -274,7 +283,7 @@ export function generateEmptySingleOrDoubleHungWindow(): SingleOrDoubleHungWindo
 
 // 5. Validation Functions
 
-export function validateWindowMeasurements(measurements: FourSidedValues): { isValid: boolean; errors: string[] } {
+export function validateWindowMeasurements(measurements: FourSidedMeasurements): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
   
   if (!measurements.top || measurements.top <= 0) {
@@ -374,11 +383,11 @@ export function calculateThicknessVector(extensionConfig: ExtensionConfig): Reco
 }
 
 export function calculateWorkingMeasurements(
-  originalMeasurements: FourSidedValues,
+  originalMeasurements: FourSidedMeasurements,
   extensionConfig: ExtensionConfig,
   thicknessVector: Record<string, number>
 ): CalculatedMeasurements {
-  if (!extensionConfig.Extension) {
+  if (!extensionConfig.Extension) {å
     return {
       ...originalMeasurements,
       transformation_applied: false,
@@ -779,7 +788,7 @@ export function calculateAdjustedHorizontalSubsections(
 }
 
 export function calculateExtensionResults(
-  originalMeasurements: FourSidedValues,
+  originalMeasurements: FourSidedMeasurements,
   originalSplits: VerticalSplit[],
   extensionConfig: ExtensionConfig
 ): {
