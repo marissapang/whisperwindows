@@ -1,7 +1,7 @@
 import { customAlphabet } from 'nanoid';
-import { createSingleOrDoubleHungWindow, singleOrDoubleHungWindowMeta, calculateAndUpdateWindow } from './createSingleOrDoubleHungWindow';
+import { windowMeta, calculateAndUpdateWindow } from './createWindowObject';
 
-// helper fun functions
+// helper functions
 function generateOrderId(n=6){
 	const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 	const order_id = customAlphabet(alphabet, 6)()
@@ -323,9 +323,9 @@ export const orderMeta = {
 		},
 		fields: {
 			Windows: {
-				'type': 'array',
+				'type': 'window_object_array',
 				'label': 'Window Collection',
-				'itemMeta': singleOrDoubleHungWindowMeta
+				'itemMeta': windowMeta
 			}
 		}
 	}

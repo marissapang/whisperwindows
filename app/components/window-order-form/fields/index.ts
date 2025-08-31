@@ -1,5 +1,5 @@
 import { StringField } from './StringField';
-import { ArrayField } from './ArrayField';
+import { WindowObjectArrayContainer } from './WindowObjectArrayContainer';
 import { BooleanField } from './BooleanField';
 import { NumberInchesField } from './NumberInchesField';
 import { NumberDollarsField } from './NumberDollarsField';
@@ -12,7 +12,7 @@ import { LongTextField } from './LongTextField';
 
 export const fieldComponentMap: Record<string, any> = {
   string: StringField,
-  array: ArrayField,
+  window_object_array: WindowObjectArrayContainer,
   bool: BooleanField,
   number: NumberInchesField, // Use NumberInchesField for basic numbers too
   integer: NumberInchesField,

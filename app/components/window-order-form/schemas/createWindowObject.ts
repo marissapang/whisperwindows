@@ -32,7 +32,7 @@ export function generateSplitId(n=6){
 // Re-export types from comprehensive schema
 export type { ExtensionConfig, VerticalSplit, HorizontalSplit, WindowMeasurements, CalculatedMeasurements, FramePiece, CutListItem };
 
-export interface SingleOrDoubleHungWindow {
+export interface WindowObject {
 	Window_Id: string;
 	Window_Type: 'Single/Double Hung Window';
 	Order_Position: number;
@@ -80,7 +80,7 @@ export interface SingleOrDoubleHungWindow {
 	};
 }
 
-function generateEmptySingleOrDoubleHungWindow(): SingleOrDoubleHungWindow {
+export function createWindowObject(): WindowObject {
 	return {
 		Window_Id: generateWindowId(),
 		Window_Type: 'Single/Double Hung Window',
@@ -295,7 +295,7 @@ export function calculateAndUpdateWindow(window: SingleOrDoubleHungWindow): Sing
 	}
 }
 
-const singleOrDoubleHungWindowMeta = {
+const windowMeta = {
 	Window_Id: {
 		'type': 'string',
 		'label': "Window ID", 
@@ -402,6 +402,5 @@ const singleOrDoubleHungWindowMeta = {
 	}
 }
 
-export const createSingleOrDoubleHungWindow = () => generateEmptySingleOrDoubleHungWindow();
 
-export { singleOrDoubleHungWindowMeta };
+export { windowMeta };
