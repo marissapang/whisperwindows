@@ -1,5 +1,5 @@
 import { StringField } from './StringField';
-import { WindowObjectArrayContainer } from './WindowObjectArrayContainer';
+import { WindowObjectArrayContainer } from '../WindowObjectArrayContainer';
 import { BooleanField } from './BooleanField';
 import { NumberInchesField } from './NumberInchesField';
 import { NumberDollarsField } from './NumberDollarsField';

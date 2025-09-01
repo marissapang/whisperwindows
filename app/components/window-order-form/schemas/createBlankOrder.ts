@@ -1,5 +1,5 @@
 import { customAlphabet } from 'nanoid';
-import { windowMeta, calculateAndUpdateWindow } from './createWindowObject';
+import { calculateAndUpdateWindow } from './createWindowObject';
 
 // helper functions
 function generateOrderId(n=6){
@@ -324,8 +324,8 @@ export const orderMeta = {
 		fields: {
 			Windows: {
 				'type': 'window_object_array',
-				'label': 'Window Collection',
-				'itemMeta': windowMeta
+				'label': 'Window',
+				//'itemMeta': windowMeta
 			}
 		}
 	}

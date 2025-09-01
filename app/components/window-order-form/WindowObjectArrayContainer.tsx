@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { fieldComponentMap } from './index';
+import { useState, useEffect } from 'react';
+import { fieldComponentMap } from './fields/index';
 import { WindowMeasurementInterface } from './WindowMeasurementInterface';
+import { createBlankWindowObject } from './schemas/createWindowObject';
+
 
 // Basic item structure that all array items should have
 interface ArrayItem {
@@ -21,20 +23,33 @@ interface FieldConfig {
 interface ArrayFieldProps {
   value: ArrayItem[];
   editable: boolean;
-  label: string;
-  itemMeta: Record<string, FieldConfig>;
+  // label: string;
+  // itemMeta: Record<string, FieldConfig>;
   onChange: (newArray: ArrayItem[]) => void;
-  createNewItem: () => ArrayItem;
+  // createNewItem: () => ArrayItem;
 }
 
 export function WindowObjectArrayContainer({ 
   value = [], 
   editable, 
-  label, 
-  itemMeta, 
+  // label, 
   onChange, 
-  createNewItem 
+  // createNewItem 
 }: ArrayFieldProps) {
+  
+  useEffect(() => {
+    console.log("Inside Window Object Array Container")
+    console.log("value")
+    console.log(value)
+    console.log(label)
+    console.log(onChange)
+    console.log(createNewItem)
+
+  });
+
+  const createNewItem = createBlankWindowObject;
+  const label = "Window"
+
   const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
 
   const addItem = () => {
@@ -98,7 +113,7 @@ export function WindowObjectArrayContainer({
           editable={editable}
           onChange={(field: string, newValue: unknown) => updateItem(index, field, newValue)}
           onUpdateWindow={(updatedWindow: ArrayItem) => updateEntireItem(index, updatedWindow)}
-          itemMeta={itemMeta}
+          // itemMeta={itemMeta}
         />
       );
     }
@@ -128,14 +143,13 @@ export function WindowObjectArrayContainer({
   return (
     <div className="border rounded-lg p-4 mb-4">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">{label}</h3>
         {editable && (
           <button
             type="button"
             onClick={addItem}
             className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
           >
-            Add Windows Collection
+            Add Window
           </button>
         )}
       </div>
