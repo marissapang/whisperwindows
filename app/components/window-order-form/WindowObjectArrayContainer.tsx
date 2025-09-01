@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fieldComponentMap } from './fields/index';
-import { WindowMeasurementInterface } from './WindowMeasurementInterface';
-import { createBlankWindowObject } from './schemas/createWindowObject';
+import { fieldComponentMap } from './fields-generic/index';
+import { Window } from './Window';
+import { createBlankWindowObject } from './libs/constructors';
 
 
 // Basic item structure that all array items should have
@@ -108,7 +108,7 @@ export function WindowObjectArrayContainer({
     // Check if this is a window item and use the special interface
     if (item.Window_Type === 'Window' || label.toLowerCase().includes('window')) {
       return (
-        <WindowMeasurementInterface
+        <Window
           value={item}
           editable={editable}
           onChange={(field: string, newValue: unknown) => updateItem(index, field, newValue)}

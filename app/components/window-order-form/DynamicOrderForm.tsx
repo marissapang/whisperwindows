@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { fieldComponentMap } from './fields';
-import { createBlankWindowObject } from './schemas/createWindowObject';
-import { prepareOrderForDatabase } from './libs/orderProcessing';
+import { fieldComponentMap } from './fields-generic';
+import { createBlankWindowObject } from './libs/constructors';
+import { prepareOrderForDatabase } from './libs/db_update';
 
 
 export function DynamicOrderForm({

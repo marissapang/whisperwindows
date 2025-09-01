@@ -1,28 +1,3 @@
-import { customAlphabet } from 'nanoid';
-import { calculateAndUpdateWindow } from './createWindowObject';
-
-// helper functions
-function generateOrderId(n=6){
-	const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-	const order_id = customAlphabet(alphabet, 6)()
-	console.log(`inside genOrderID: order id is ${order_id}`)
-	return order_id; 
-}
-
-//-----------------------------------------
-// address functions
-//-----------------------------------------
-
-function generateEmptyAddress(){
-	return {
-		Address_Line_1:'',
-		Address_Line_2:'',
-		City:'',
-		State:'',
-		Zip_Code:''
-	}
-}
-
 const addressMeta = {
   Address_Line_1: {'type':'string', 'label': "Address Line 1", 'omit':false},
   Address_Line_2:{'type':'string', 'label': "Address Line 2", 'omit':false},
@@ -31,47 +6,6 @@ const addressMeta = {
   Zip_Code:{'type':'string', 'label': "Zip Code", 'omit':false},
 }
 
-// //-----------------------------------------
-// // extension functions
-// //-----------------------------------------
-
-// function generateEmptyExtension(){
-// 	return {
-// 	  Extension: true,
-// 	  Configuration: "",
-// 	  Material: "",
-// 	  Bottom_Material_Override: "",
-// 	  Type: 'interior',
-// 	  Support_Notes: '',
-// 	  General_Notes: ''
-// 	}
-// }
-
-
-
-
-// //-----------------------------------------
-// // window functions
-// //-----------------------------------------
-// export const createBlankWindow = () => ({
-// 	Room_Name:'',
-// 	Window_Name:'',
-// 	Window_Material_Notes:'',
-// 	Window_Depth: 0,
-// 	Window_Depth_Notes:'',
-// 	Extension: generateEmptyExtension(),
-// 	Products:[]
-// })
-
-// export const windowMeta = {
-// 	Room_Name:{'type':'string', 'label': "Room Name", 'omit':false},
-// 	Window_Name:{'type':'string', 'label': "Window Name", 'omit':false},
-// 	Window_Material_Notes:{'type':'longtext', 'label': "Window Material Notes", 'omit':false},
-// 	Window_Depth: {'type':'number_inches', 'label': "Current Window Frame Depth", 'omit':false},
-// 	Window_Depth_Notes:{'type':'longtext', 'label': "Window Material Notes", 'omit':false},
-// 	Extension: generateEmptyExtension(),
-// 	Products:{product_id:{"type":'string','label':'product id', 'omit':false}}
-// }
 
 //-----------------------------------------
 // order functions
@@ -98,31 +32,6 @@ const orderStages = {
 }
 
 
-export const createBlankOrder = () => ({
-	Order_Id: generateOrderId(),
-	Client_Name: "",
-	Invoice_Number: "",
-	Order_Created_Date: new Date().toISOString().split('T')[0],
-	Order_Submitted_date: null,
-	Order_Status: "created",
-	Status: "Pre-Install",
-	Next_Steps: "",
-	Deposit_Date: null,
-	Order_Details: "",
-	Frame_Notes: "",
-	Blinds_Notes: "",
-	Payment_Stage: "Waiting on Deposit",
-	QBO_Stage: "Estimate",
-	Check_Config: "Not Started",
-	Install_Stage: "Not Started",
-	MFG_Stage: "Not Started",
-	COI_Stage: "Not Started",
-	COI_Link: "",
-	Delivery_Address: generateEmptyAddress(),
-	Delivery_Contact_Name: "",
-	Window_Width: null,
-	Windows: [] // Collection of window objects with ordering
-}) 
 
 export const orderMeta = {
 	Order_Info: {
@@ -325,12 +234,9 @@ export const orderMeta = {
 			Windows: {
 				'type': 'window_object_array',
 				'label': 'Window',
-				//'itemMeta': windowMeta
 			}
 		}
 	}
-
 }
-
 
 

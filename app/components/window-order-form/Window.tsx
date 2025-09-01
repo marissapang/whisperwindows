@@ -2,25 +2,24 @@
 
 import { useState, useEffect } from 'react';
 import { fieldComponentMap } from './index';
-import { NumberInchesField } from './fields/NumberInchesField.tsx'
-import { FourSidedMeasurementsField } from './window-specific-fields/FourSidedMeasurementsField';
+import { NumberInchesField } from './fields-generic/NumberInchesField.tsx'
+import { FourSidedMeasurementsField } from './fields-window/FourSidedMeasurementsField';
 
 
 
-interface WindowMeasurementInterfaceProps {
+interface WindowProps {
   value: WindowData;
   editable: boolean;
   onChange: (field: string, newValue: unknown) => void;
   onUpdateWindow?: (updatedWindow: WindowData) => void;
 }
 
-export function WindowMeasurementInterface({ 
+export function Window({ 
   value, 
   editable, 
   onChange, 
   onUpdateWindow
-}: WindowMeasurementInterfaceProps) {
-
+}: WindowProps) {
 
 
   const renderManualMode = () => {    

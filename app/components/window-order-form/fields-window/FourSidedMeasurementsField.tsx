@@ -1,6 +1,6 @@
 'use client';
-import { NumberInchesField } from '../fields/NumberInchesField';
-import { FourSidedMeasurements } from './schemas/comprehensiveExtensionSchema';
+import { NumberInchesField } from '../fields-generic/NumberInchesField';
+import { FourSidedMeasurements } from './libs/type';
 
 
 type Props = {
