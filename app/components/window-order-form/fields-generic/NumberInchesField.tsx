@@ -54,11 +54,8 @@ export function NumberInchesField({
 
   const handleWholeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
-    console.log('handleWholeChange'+input)
-    const newVal = parseInt(input, 10);
-    console.log('handleWholeChange'+newVal)
+    const newVal = input === '' ? 0 : parseInt(input, 10);
     const safeVal = isNaN(newVal) ? 0 : newVal;
-    console.log('handleWholeChange'+safeVal)
 
     setFullInches(safeVal);
     updateInches(safeVal, fraction);
@@ -107,7 +104,7 @@ function simplifyFraction(numerator: number, denominator: number): {
         <input
           type='text'
           className="flex-1 p-2 border rounded"
-          value={fullInches}
+          value={fullInches === 0 ? '' : fullInches}
           onChange={handleWholeChange}
           placeholder="0"
         />

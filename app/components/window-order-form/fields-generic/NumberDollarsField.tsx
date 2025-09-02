@@ -17,8 +17,8 @@ export function NumberDollarsField({
       <input
         type="number"
         className="w-full p-2 border rounded mb-3"
-        value={value ?? 0}
-        onChange={(e) => onChange(parseFloat(e.target.value))}
+        value={value && value !== 0 ? value : ''}
+        onChange={(e) => onChange(e.target.value === '' ? 0 : parseFloat(e.target.value) || 0)}
         step="0.01"
         min="0"
       />
