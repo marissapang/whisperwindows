@@ -6,7 +6,7 @@ import { NumberInchesField } from './fields-generic/NumberInchesField.tsx';
 import { FourSidedMeasurementsField } from './fields-window/FourSidedMeasurementsField';
 import { ConfigSplitsField } from './fields-window/ConfigSplitsField';
 import { createEmptyConfigSplits } from './libs/constructors';
-
+import WindowDiagram from './WindowDiagram';
 
 
 interface WindowProps {
@@ -63,6 +63,8 @@ export function Window({
         <ConfigSplitsField
           value={value?.Window_Config_Dependent_Measurements ?? createEmptyConfigSplits()}
           editable={editable}
+          totalWidthIn={value?.Window_Four_Sided_Measurements?.bottom ?? 0}
+          totalHeightIn={value?.Window_Four_Sided_Measurements.left ?? 0}
           onChange={(newValue) => onChange('Window_Config_Dependent_Measurements', newValue)}
         />
 
@@ -70,7 +72,14 @@ export function Window({
         <ConfigSplitsField
           value={value?.Panel_Config_Dependent_Parameters ?? createEmptyConfigSplits()}
           editable={editable}
+          totalWidthIn={value?.Window_Four_Sided_Measurements.bottom ?? 0}
+          totalHeightIn={value?.Window_Four_Sided_Measurements.left ?? 0}
           onChange={(newValue) => onChange('Panel_Config_Dependent_Parameters', newValue)}
+        />
+        <WindowDiagram
+          measurements = {value.Window_Four_Sided_Measurements}
+          windowSplits = {value.Window_Config_Dependent_Measurements}
+          panelSplits = {value.Panel_Config_Dependent_Parameters}
         />
 
 
