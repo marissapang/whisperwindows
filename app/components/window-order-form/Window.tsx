@@ -38,13 +38,16 @@ export function Window({
           className="w-flex border"
         />
         -
-        <input 
-          type="text" 
-          value={value.Window_Configuration} 
-          onChange={(e) => onChange("Window_Configuration", e.target.value)}
-          placeholder="Window Area Configuration"
-          className="w-flex border"
-        />
+        <div className="mt-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+          <textarea
+            value={value.Window_Configuration || ''}
+            onChange={(e) => onChange("Window_Configuration", e.target.value)}
+            placeholder="Add any notes or special instructions here..."
+            className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 min-h-[80px]"
+            rows={3}
+          />
+        </div>
 
         {/*<StringField 
           value={value?.Window_Name} editable={editable} label="Window Name"
