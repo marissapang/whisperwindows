@@ -1,4 +1,5 @@
 import { customAlphabet } from 'nanoid';
+import { FourSidedMeasurements, VerticalSplit, HorizontalSplit } from './types';
 
 // helper functions
 function generateOrderId(n=6){
@@ -57,11 +58,10 @@ export function createBlankWindowObject(): WindowObject {
 		
 		// Original input data
 		Window_Four_Sided_Measurements: createEmptyFourSidedMeasurements(),
-		Window_Vertical_Splits: [],
+		Window_Config_Dependent_Measurements: null,
+		Panel_Configs: '',
+		Panel_Config_Dependent_Parameters: null,
 	
-		// Horizontal splits by subsection
-		Window_Subsection_Horizontal_Splits: [],
-		vertical_splits_saved: false,
 		
 		// Extension configuration
 		extension: generateEmptyExtension(),
@@ -76,6 +76,24 @@ export function createEmptyFourSidedMeasurements(): FourSidedMeasurements {
     right: null
   })  
 };
+
+export function createEmptyConfigSplits(): ConfigSplits {
+	return ({
+		config: { kind: 'Single Window', pieces: 1 },
+		vertical_splits: [],
+		vertical_configs: [{ kind: 'Single Piece', pieces: 1 }],
+  		horizontal_splits: [[]],
+	})
+};
+
+
+export function createEmptyVerticalSplit(): VerticalSplit {
+	return {position: null, direction: 'left-to-right'}
+}
+
+export function createEmptyHorizontalSplit(): HorizontalSplit {
+	return {position: null, direction: 'bottom-to-top'}
+}
 
 export function generateEmptyExtension(): ExtensionConfig {
   return {

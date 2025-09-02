@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { fieldComponentMap } from './index';
-import { NumberInchesField } from './fields-generic/NumberInchesField.tsx'
+import { NumberInchesField } from './fields-generic/NumberInchesField.tsx';
 import { FourSidedMeasurementsField } from './fields-window/FourSidedMeasurementsField';
+import { ConfigSplitsField } from './fields-window/ConfigSplitsField';
+import { createEmptyConfigSplits } from './libs/constructors';
 
 
 
@@ -22,10 +24,11 @@ export function Window({
 }: WindowProps) {
 
 
-  const renderManualMode = () => {    
-    
-    return (
-      <div className="space-y-4">
+
+  return (
+    <div className="space-y-4">      
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="space-y-4">
 
         <input 
           type="text" 
@@ -55,14 +58,23 @@ export function Window({
           editable={editable}
           onChange={(newValue) => onChange('Window_Four_Sided_Measurements', newValue)}
         />
-      </div>
-    );
-  };
+        <br/>
+        <h3 className="text-xl font-semibold">Window Configuration</h3>
+        <ConfigSplitsField
+          value={value?.Window_Config_Dependent_Measurements ?? createEmptyConfigSplits()}
+          editable={editable}
+          onChange={(newValue) => onChange('Window_Config_Dependent_Measurements', newValue)}
+        />
 
-  return (
-    <div className="space-y-4">      
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        {renderManualMode()}
+        <h3 className="text-xl font-semibold">Panel Configuration</h3>
+        <ConfigSplitsField
+          value={value?.Panel_Config_Dependent_Parameters ?? createEmptyConfigSplits()}
+          editable={editable}
+          onChange={(newValue) => onChange('Panel_Config_Dependent_Parameters', newValue)}
+        />
+
+
+      </div>
       </div>
     </div>
   );

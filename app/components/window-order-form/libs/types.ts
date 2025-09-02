@@ -6,33 +6,48 @@ export interface FourSidedMeasurements {
   right: number  | null;   // Height measurement on right
 }
 
-export type WindowConfig =
+export type HorizontalConfigOptions =
   | { kind: 'Single Window'; pieces: 1 }
   | { kind: '2Pc Side-by-Side'; pieces: 2 }
   | { kind: '3Pc Side-by-Side'; pieces: 3 }
   | { kind: 'Multi-Pc Side by Side'; pieces: number }; // n >= 1
 
+export type VerticalConfigOptions = 
+  | { kind: 'Single Piece'; pieces: 1}
+  | { kind: 'Up-Down'; pieces: 2}
+  | { kind: 'Up-Middle-Down'; pieces: 3}
+
+
+
 // Split system interfaces
 export interface VerticalSplit {
   position: number;                           // Position in inches from LEFT edge
   direction: 'left-to-right' | 'right-to-left';
-  // // Calculation tracking
-  // original_position?: number;
-  // position_adjustment?: number;
+}
+
+export interface HorizontalSplit {
+  position: number;                           // Position in inches from BOTTOM edge
+  direction: 'bottom-to-top' | 'top-to-bottom';
+}
+
+export interface ConfigSplits {
+  config: HorizontalConfigOptions;        // decides n panes
+  vertical_splits: VerticalSplit[];       // length n - 1
+  vertical_configs: VerticalConfigOptions[]; // length n (one per pane)
+  horizontal_splits: HorizontalSplit[][]; // outer length n; inner length (per pane) = vertical_configs[i].pieces - 1
 }
 
 export interface WindowObject {
 	Window_Name: string;
-	Window_Configuration: WindowConfig;
+	Window_Configuration: string;
 	Order_Position: number;
 	
 	// === ORIGINAL INPUT DATA (Not modified by calculations) ===
 	Window_Four_Sided_Measurements: FourSidedMeasurements;
-	Window_Vertical_Splits: VerticalSplit[];
+	Window_Config_Dependent_Measurements: ConfigSplits;
+  Panel_Configs: string;
+  Panel_Config_Dependent_Parameters: ConfigSplits;
 	
-	// === HORIZONTAL SPLITS BY SUBSECTION ===
-	Window_Subsection_Horizontal_Splits: HorizontalSplit[];
-	vertical_splits_saved: boolean; // Tracks if vertical splits have been saved to enable horizontal input
 	
 	extension: ExtensionConfig;
 }
@@ -40,13 +55,6 @@ export interface WindowObject {
 
 
 
-export interface HorizontalSplit {
-  position: number;                           // Position in inches from TOP edge
-  direction: 'bottom-to-top' | 'top-to-bottom';
-  // // Calculation tracking
-  // original_position?: number;
-  // position_adjustment?: number;
-}
 
 // Extension configuration interface
 export interface ExtensionConfig {
