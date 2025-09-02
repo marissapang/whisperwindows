@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { fieldComponentMap } from './fields';
-import { createWindowObject } from './schemas/createWindowObject';
-import { prepareOrderForDatabase } from './libs/orderProcessing';
+import { fieldComponentMap } from './fields-generic';
+import { createBlankWindowObject } from './libs/constructors';
+import { prepareOrderForDatabase } from './libs/db_update';
 
 
 export function DynamicOrderForm({
@@ -194,20 +194,14 @@ export function DynamicOrderForm({
         continue;
       }
 
+      const perms = resolvePermissions(fullPath, orderMeta);
+      if (!perms.visibleTo.includes(view)){
+        continue;
+      } 
+
+      const editable = perms.editableBy.includes(view) && !perms.readOnlyStages.includes(order.Order_Status);
+
       if (fieldConfig.type === 'window_object_array') {
-        const perms = resolvePermissions(fullPath, orderMeta);
-        if (!perms.visibleTo.includes(view)) {
-          continue;
-        }
-        
-        const editable = perms.editableBy.includes(view) && !perms.readOnlyStages.includes(order.Order_Status);
-        
-        // Determine the create function based on the array content
-        let createNewItem = () => ({});
-        if (key === 'Windows' && fieldConfig.itemMeta) {
-          createNewItem = createWindowObject;
-        }
-        
         const WindowObjectArrayContainer = fieldComponentMap['window_object_array'];
         fields.push(
           <div key={fullPath} className={`mt-4 mb-2 ${padding}`}>
@@ -216,7 +210,7 @@ export function DynamicOrderForm({
               editable={editable}
               label={fieldConfig.label || key}
               itemMeta={fieldConfig.itemMeta}
-              createNewItem={createNewItem}
+              createNewItem={createBlankWindowObject}
               onChange={(newArray: any[]) => {
                 const updated = updateNestedField(order, fullPath, newArray);
                 setOrder(updated);
@@ -227,14 +221,8 @@ export function DynamicOrderForm({
         continue;
       }
 
-      const perms = resolvePermissions(fullPath, orderMeta);
-      if (!perms.visibleTo.includes(view)){
-      	continue;
-      } 
 
-
-
-      const editable = perms.editableBy.includes(view) && !perms.readOnlyStages.includes(order.Order_Status);
+      
       const label = fieldConfig.label || key;
       const type = fieldConfig.type;
 
