@@ -196,13 +196,6 @@ export function ConfigSplitsField({
               <div key={`v-${i}`} className="border rounded p-3">
                 <div className="text-xs text-gray-600 mb-2">Split {i + 1}</div>
 
-                <NumberInchesField
-                  value={displayed}
-                  editable={editable}
-                  label="Measured position"
-                  onChange={(pos) => setVerticalDisplayed(i, pos)}
-                />
-
                 <label className="block text-xs text-gray-600 mb-1">Measured from</label>
                 <select
                   className="p-2 border rounded w-full"
@@ -215,6 +208,13 @@ export function ConfigSplitsField({
                   <option value="left-to-right">left → right</option>
                   <option value="right-to-left">right → left</option>
                 </select>
+
+                <NumberInchesField
+                  value={displayed}
+                  editable={editable}
+                  label="Measured position"
+                  onChange={(pos) => setVerticalDisplayed(i, pos)}
+                />
 
                 {/* Optional: show absolute in small text for debugging */}
                 {/* <div className="text-xs text-gray-500 mt-2">abs: {s.position}"</div> */}
@@ -273,12 +273,7 @@ export function ConfigSplitsField({
                     <div key={`h-${paneIdx}-${idx}`} className="border rounded p-2 mb-2">
                       <div className="text-xs text-gray-600 mb-2">Row {idx + 1}</div>
 
-                      <NumberInchesField
-                        value={displayed}
-                        editable={editable}
-                        label="Measured position"
-                        onChange={(pos) => setHorizontalDisplayed(paneIdx, idx, pos)}
-                      />
+
 
                       <label className="block text-xs text-gray-600 mb-1">Measured from</label>
                       <select
@@ -294,6 +289,13 @@ export function ConfigSplitsField({
                         <option value="bottom-to-top">bottom → top</option>
                         <option value="top-to-bottom">top → bottom</option>
                       </select>
+
+                      <NumberInchesField
+                        value={displayed}
+                        editable={editable}
+                        label="Measured position"
+                        onChange={(pos) => setHorizontalDisplayed(paneIdx, idx, pos)}
+                      />
 
                       {/* Optional absolute debug */}
                       {/* <div className="text-xs text-gray-500 mt-2">abs: {row.position}"</div> */}
