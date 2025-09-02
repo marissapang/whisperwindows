@@ -292,9 +292,12 @@ export function DynamicOrderForm({
 		})}
 		<button 
 			type="button"
-			className="bg-black text-white"
-			onClick={handleSave}>
-			submit button
+			className={`px-4 py-2 rounded text-white font-medium ${
+				status === 'success' ? 'bg-green-600' : 'bg-black'
+			}`}
+			onClick={handleSave}
+			disabled={status === 'saving'}>
+			{status === 'success' ? 'Submitted' : status === 'saving' ? 'Submitting...' : 'Submit'}
 		</button>
 		</form>
 		</div>
