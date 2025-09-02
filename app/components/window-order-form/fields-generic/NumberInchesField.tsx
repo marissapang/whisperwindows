@@ -103,15 +103,16 @@ function simplifyFraction(numerator: number, denominator: number): {
   return editable ? (
     <div className="mb-3">
       <label className="block font-medium text-sm text-gray-700 mb-1">{label}</label>
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-center">
         <input
           type='text'
-          className="w-1/2 p-2 border rounded"
+          className="flex-1 p-2 border rounded"
           value={fullInches}
           onChange={handleWholeChange}
+          placeholder="0"
         />
         <select
-          className="w-1/2 p-2 border rounded"
+          className="w-20 p-2 border rounded text-sm"
           value={fraction}
           onChange={handleFractionChange}
         >
@@ -121,6 +122,7 @@ function simplifyFraction(numerator: number, denominator: number): {
             </option>
           ))}
         </select>
+        <span className="text-gray-500 text-sm">"</span>
       </div>
     </div>
   ) : (
