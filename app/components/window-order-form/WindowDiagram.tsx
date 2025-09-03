@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+
 /** ==== Props ==== */
 type DiagramProps = {
   measurements: FourSidedMeasurements;
@@ -30,11 +31,6 @@ const STROKES = {
 
 /** ==== Helpers ==== */
 
-function hasMeasurements(measurements?: FourSidedMeasurements | null) {
-  if (!measurements) return false;
-  const { top, bottom, left, right } = measurements;
-  return top != null && bottom != null && left != null && right != null;
-}
 
 
 /** window width/height in inches (min edges, never negative) */
@@ -254,7 +250,13 @@ export default function WindowDiagram({
   panelCellPadding = 6,
 }: DiagramProps) {
   // 1) Readiness flags
-  const readyMeasurements = hasMeasurements(measurements);
+  const readyMeasurements =
+    !!measurements &&
+    measurements.top    != null &&
+    measurements.bottom != null &&
+    measurements.left   != null &&
+    measurements.right  != null;
+
   const windowCfgReady = !!windowSplits?.config?.pieces;
   const panelCfgReady  = !!panelSplits?.config?.pieces;
 
