@@ -5,11 +5,15 @@ export function StringField({
   editable,
   label,
   onChange,
+  onBlur,
+  onFocus,
 }: {
   value: string;
   editable: boolean;
   label: string;
   onChange: (v: string) => void;
+  onBlur?: () => void;
+  onFocus?: () => void;
 }) {
   return editable ? (
     <div>
@@ -19,6 +23,8 @@ export function StringField({
         className="w-full p-2 border rounded mb-3"
         value={value ?? ''}
         onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
+        onFocus={onFocus}
       />
     </div>
   ) : (

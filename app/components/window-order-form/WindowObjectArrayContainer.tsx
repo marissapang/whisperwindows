@@ -23,18 +23,22 @@ interface FieldConfig {
 interface ArrayFieldProps {
   value: ArrayItem[];
   editable: boolean;
-  // label: string;
-  // itemMeta: Record<string, FieldConfig>;
+  label: string;
+  itemMeta: Record<string, FieldConfig>;
   onChange: (newArray: ArrayItem[]) => void;
-  // createNewItem: () => ArrayItem;
+  createNewItem: () => ArrayItem;
+  onBlur?: () => void;
+  onFocus?: () => void;
 }
 
 export function WindowObjectArrayContainer({ 
   value = [], 
   editable, 
-  // label, 
+  label, 
   onChange, 
-  // createNewItem 
+  createNewItem,
+  onBlur,
+  onFocus
 }: ArrayFieldProps) {
   
   useEffect(() => {
@@ -47,13 +51,14 @@ export function WindowObjectArrayContainer({
 
   });
 
-  const createNewItem = createBlankWindowObject;
-  const label = "Window"
+  // Use provided createNewItem or fallback to createBlankWindowObject
+  const actualCreateNewItem = createNewItem || createBlankWindowObject;
+  const actualLabel = label || "Window";
 
   const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
 
   const addItem = () => {
-    const newItem = createNewItem();
+    const newItem = actualCreateNewItem();
     // Update Order_Position for new items
     newItem.Order_Position = value.length + 1;
     onChange([...value, newItem]);
@@ -113,7 +118,8 @@ export function WindowObjectArrayContainer({
           editable={editable}
           onChange={(field: string, newValue: unknown) => updateItem(index, field, newValue)}
           onUpdateWindow={(updatedWindow: ArrayItem) => updateEntireItem(index, updatedWindow)}
-          // itemMeta={itemMeta}
+          onBlur={onBlur}
+          onFocus={onFocus}
         />
       );
     }
@@ -155,7 +161,7 @@ export function WindowObjectArrayContainer({
       </div>
 
       {value.length === 0 ? (
-        <p className="text-gray-500 italic">No {label.toLowerCase()} added yet.</p>
+        <p className="text-gray-500 italic">No {actualLabel.toLowerCase()} added yet.</p>
       ) : (
         <div className="space-y-3">
           {value.map((item, index) => (

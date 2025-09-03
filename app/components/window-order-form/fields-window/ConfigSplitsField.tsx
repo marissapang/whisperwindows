@@ -2,13 +2,15 @@
 
 import { useMemo } from 'react';
 import { NumberInchesField } from '../fields-generic/NumberInchesField';
-
+import { ConfigSplits, HorizontalConfigOptions, VerticalConfigOptions, VerticalSplit, HorizontalSplit } from '../libs/types';
 
 type Props = {
   value: ConfigSplits;
   editable: boolean;
-  onChange: (newValue: ConfigSplits) => void;
-  /** Required for direction ↔ absolute conversion */
+  label: string;
+  onChange: (v: ConfigSplits) => void;
+  onBlur?: () => void;
+  onFocus?: () => void;
   totalWidthIn: number;   // inches (use min(top,bottom))
   totalHeightIn: number;  // inches (use min(left,right))
   className?: string;
@@ -83,7 +85,10 @@ function absoluteFromDisplay(
 export function ConfigSplitsField({
   value,
   editable,
+  label,
   onChange,
+  onBlur,
+  onFocus,
   totalWidthIn,
   totalHeightIn,
   className,
@@ -155,11 +160,12 @@ export function ConfigSplitsField({
       {/* Horizontal (side-by-side) configuration */}
       <div className="flex items-end gap-3">
         <div className="flex flex-col">
-          <label className="text-sm text-gray-700 mb-1">Side-by-Side Configuration</label>
+          <label className="text-sm text-gray-700 mb-1">{label}</label>
           <select
             className="p-2 border rounded"
             value={normalized.config.kind}
             onChange={(e) => setConfigKind(e.target.value as HorizontalConfigOptions['kind'])}
+            onBlur={onBlur}
             disabled={!editable}
           >
             <option value="Single Window">Single Window</option>
@@ -178,6 +184,7 @@ export function ConfigSplitsField({
               className="p-2 border rounded w-24"
               value={n}
               onChange={(e) => setConfigPieces(clampPieces(Number(e.target.value)))}
+              onBlur={onBlur}
               disabled={!editable}
             />
           </div>
@@ -203,6 +210,7 @@ export function ConfigSplitsField({
                   onChange={(e) =>
                     updateVerticalSplit(i, { direction: e.target.value as VerticalSplit['direction'] })
                   }
+                  onBlur={onBlur}
                   disabled={!editable}
                 >
                   <option value="left-to-right">left → right</option>
@@ -214,6 +222,7 @@ export function ConfigSplitsField({
                   editable={editable}
                   label="Measured position"
                   onChange={(pos) => setVerticalDisplayed(i, pos)}
+                  onBlur={onBlur}
                 />
 
                 {/* Optional: show absolute in small text for debugging */}
@@ -246,16 +255,17 @@ export function ConfigSplitsField({
                 <div className="mb-3">
                   <label className="block text-xs text-gray-600 mb-1">Vertical Piece Config</label>
                   <select
-                    className="p-2 border rounded w-full"
+                    className="flex-1 p-1 border rounded text-sm"
                     value={vCfg.kind}
                     onChange={(e) => {
                       const kind = e.target.value as VerticalConfigOptions['kind'];
-                      const next =
-                        kind === 'Single Piece' ? { kind, pieces: 1 }
-                        : kind === 'Up-Down'    ? { kind, pieces: 2 }
-                        :                          { kind, pieces: 3 }; // Up-Middle-Down
+                      const next: VerticalConfigOptions =
+                        kind === 'Single Piece' ? { kind, pieces: 1 as const }
+                        : kind === 'Up-Down'    ? { kind, pieces: 2 as const }
+                        :                          { kind, pieces: 3 as const }; // Up-Middle-Down
                       setPaneVerticalConfig(paneIdx, next);
                     }}
+                    onBlur={onBlur}
                     disabled={!editable}
                   >
                     <option value="Single Piece">Single Piece</option>
@@ -273,9 +283,21 @@ export function ConfigSplitsField({
                     <div key={`h-${paneIdx}-${idx}`} className="border rounded p-2 mb-2">
                       <div className="text-xs text-gray-600 mb-2">Row {idx + 1}</div>
 
-
-
                       <label className="block text-xs text-gray-600 mb-1">Measured from</label>
+                      <input
+                        type="number"
+                        className="w-20 p-1 border rounded text-sm"
+                        value={row.position}
+                        onChange={(e) => {
+                          const newCount = parseInt(e.target.value) || 1;
+                          updateHorizontalSplit(paneIdx, idx, { position: newCount });
+                        }}
+                        onBlur={onBlur}
+                        onFocus={onFocus}
+                        min="1"
+                      />
+
+                      <label className="block text-xs text-gray-600 mb-1">Direction</label>
                       <select
                         className="p-2 border rounded w-full"
                         value={row.direction}
@@ -284,6 +306,8 @@ export function ConfigSplitsField({
                             direction: e.target.value as HorizontalSplit['direction'],
                           })
                         }
+                        onBlur={onBlur}
+                        onFocus={onFocus}
                         disabled={!editable}
                       >
                         <option value="bottom-to-top">bottom → top</option>
@@ -295,6 +319,8 @@ export function ConfigSplitsField({
                         editable={editable}
                         label="Measured position"
                         onChange={(pos) => setHorizontalDisplayed(paneIdx, idx, pos)}
+                        onBlur={onBlur}
+                        onFocus={onFocus}
                       />
 
                       {/* Optional absolute debug */}

@@ -5,11 +5,15 @@ export function NumberDollarsField({
   editable,
   label,
   onChange,
+  onBlur,
+  onFocus,
 }: {
   value: number;
   editable: boolean;
   label: string;
   onChange: (v: number) => void;
+  onBlur?: () => void;
+  onFocus?: () => void;
 }) {
   return editable ? (
     <div>
@@ -17,8 +21,10 @@ export function NumberDollarsField({
       <input
         type="number"
         className="w-full p-2 border rounded mb-3"
-        value={value && value !== 0 ? value : ''}
-        onChange={(e) => onChange(e.target.value === '' ? 0 : parseFloat(e.target.value) || 0)}
+        value={value ?? ''}
+        onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+        onBlur={onBlur}
+        onFocus={onFocus}
         step="0.01"
         min="0"
       />

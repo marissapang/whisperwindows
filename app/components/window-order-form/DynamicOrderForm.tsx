@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { fieldComponentMap } from './fields-generic';
 import { createBlankWindowObject } from './libs/constructors';
 import { prepareOrderForDatabase } from './libs/db_update';
@@ -19,6 +19,12 @@ export function DynamicOrderForm({
 }) {
 
 	const [status, setStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
+	
+	// Auto-save state management
+	const [saveStatus, setSaveStatus] = useState<'idle' | 'pending' | 'saving' | 'saved' | 'error'>('idle');
+	const blurCountRef = useRef(0);
+	const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+	const BLUR_THRESHOLD = 3;
 
 	// Filter out group-only layers from path
   const pruneMetaPath = (meta: any, fullPath: string): string => {
@@ -152,6 +158,66 @@ export function DynamicOrderForm({
     }
   };
 
+	// Auto-save functionality
+	const handleAutoSave = useCallback(async () => {
+		setSaveStatus('saving');
+		
+		try {
+			const processedOrder = prepareOrderForDatabase(order);
+			
+			const res = await fetch('/api/orders/create', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(processedOrder),
+			});
+			
+			const data = await res.json();
+			
+			if (data.success) {
+				setSaveStatus('saved');
+			} else {
+				console.error('Auto-save error:', data.error);
+				setSaveStatus('error');
+			}
+		} catch (err) {
+			console.error('Auto-save unexpected error:', err);
+			setSaveStatus('error');
+		}
+	}, [order]);
+	
+	const handleFieldBlur = useCallback(() => {
+		blurCountRef.current += 1;
+		
+		// Show pending state immediately on first blur
+		if (blurCountRef.current === 1) {
+			setSaveStatus('pending');
+		}
+		
+		if (blurCountRef.current >= BLUR_THRESHOLD) {
+			blurCountRef.current = 0;
+			handleAutoSave();
+		}
+	}, [handleAutoSave]);
+	
+	const handleFieldFocus = useCallback(() => {
+		// Reset save status when user clicks into a field
+		if (saveStatus === 'saved') {
+			setSaveStatus('idle');
+			blurCountRef.current = 0; // Reset blur count when user starts editing again
+		}
+		
+		// Clear any pending save timeout
+		if (saveTimeoutRef.current) {
+			clearTimeout(saveTimeoutRef.current);
+			saveTimeoutRef.current = null;
+		}
+	}, [saveStatus]);
+	
+	const handleFieldChange = useCallback(() => {
+		// This is called on every change but we don't reset status here
+		// Only reset when user clicks into field
+	}, []);
+
 	// recursively calls on itself to read and render nested fields 
 	const renderFields = (
     data: any,
@@ -212,9 +278,12 @@ export function DynamicOrderForm({
               itemMeta={fieldConfig.itemMeta}
               createNewItem={createBlankWindowObject}
               onChange={(newArray: any[]) => {
+                handleFieldChange();
                 const updated = updateNestedField(order, fullPath, newArray);
                 setOrder(updated);
               }}
+              onBlur={handleFieldBlur}
+              onFocus={handleFieldFocus}
             />
           </div>
         );
@@ -255,9 +324,12 @@ export function DynamicOrderForm({
                 setOrder(updatedOrder);
               }}
               onChange={(v: any) => {
+                handleFieldChange();
                 const updated = updateNestedField(order, fullPath, v);
                 setOrder(updated);
               }}
+              onBlur={handleFieldBlur}
+              onFocus={handleFieldFocus}
             />
           </div>
         );
@@ -270,9 +342,12 @@ export function DynamicOrderForm({
               label={label}
               options={fieldConfig.options}
               onChange={(v: any) => {
+                handleFieldChange();
                 const updated = updateNestedField(order, fullPath, v);
                 setOrder(updated);
               }}
+              onBlur={handleFieldBlur}
+              onFocus={handleFieldFocus}
             />
           </div>
         );
@@ -285,9 +360,48 @@ export function DynamicOrderForm({
   };
 
 	return (
-		<div>
+		<div className="relative">
+			{/* Auto-save indicator */}
+			<div className="fixed top-4 right-4 z-50">
+				{saveStatus === 'saving' && (
+					<div className="bg-white border border-gray-200 rounded-lg shadow-lg px-4 py-2 flex items-center gap-2">
+						<div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent"></div>
+						<span className="text-sm text-gray-700">Saving...</span>
+					</div>
+				)}
+				
+				{saveStatus === 'saved' && (
+					<div className="bg-white border border-green-200 rounded-lg shadow-lg px-4 py-2 flex items-center gap-2">
+						<div className="rounded-full h-4 w-4 bg-green-500 flex items-center justify-center">
+							<svg className="h-2.5 w-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+								<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+							</svg>
+						</div>
+						<span className="text-sm text-green-700">Saved</span>
+					</div>
+				)}
+				
+				{saveStatus === 'error' && (
+					<div className="bg-white border border-red-200 rounded-lg shadow-lg px-4 py-2 flex items-center gap-2">
+						<div className="rounded-full h-4 w-4 bg-red-500 flex items-center justify-center">
+							<svg className="h-2.5 w-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+								<path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+							</svg>
+						</div>
+						<span className="text-sm text-red-700">Save failed</span>
+						<button 
+							onClick={() => setSaveStatus('idle')}
+							className="ml-2 text-xs text-red-600 hover:text-red-800"
+						>
+							×
+						</button>
+					</div>
+				)}
+			</div>
+			
 		<form>
 		{renderFields(order, orderMeta, (path, value) => {
+			handleFieldChange();
 			setOrder((prev) => updateNestedField(prev, path, value));
 		})}
 		<button 

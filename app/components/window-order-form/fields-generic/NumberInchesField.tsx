@@ -26,11 +26,15 @@ export function NumberInchesField({
   editable,
   label,
   onChange,
+  onBlur,
+  onFocus,
 }: {
   value: number;
   editable: boolean;
   label: string;
   onChange: (v: number) => void;
+  onBlur?: () => void;
+  onFocus?: () => void;
 }) {
   const [fullInches, setFullInches] = useState<number>(0);
   const [fraction, setFraction] = useState<number>(0);
@@ -106,12 +110,16 @@ function simplifyFraction(numerator: number, denominator: number): {
           className="flex-1 p-2 border rounded"
           value={fullInches === 0 ? '' : fullInches}
           onChange={handleWholeChange}
+          onBlur={onBlur}
+          onFocus={onFocus}
           placeholder="0"
         />
         <select
           className="w-20 p-2 border rounded text-sm"
           value={fraction}
           onChange={handleFractionChange}
+          onBlur={onBlur}
+          onFocus={onFocus}
         >
           {FRACTIONS.map((f) => (
             <option key={f.value} value={f.value}>

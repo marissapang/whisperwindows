@@ -5,15 +5,21 @@ import { FourSidedMeasurements } from './libs/type';
 
 type Props = {
   /** The four-sided value from your Window object */
-  value?: FourSidedMeasurements | null;
+  value: FourSidedMeasurements;
   /** Controls edit vs read-only rendering for the inner inputs */
   editable: boolean;
+  /** Label for the field */
+  label: string;
   /**
    * Emits the full, updated FourSidedMeasurements object.
    * In the parent, you'll forward this into your existing onChange:
    * onChange('Window_Four_Sided_Measurements', next)
    */
-  onChange: (next: FourSidedMeasurements) => void;
+  onChange: (v: FourSidedMeasurements) => void;
+  /** Called when any field loses focus */
+  onBlur?: () => void;
+  /** Called when any field gains focus */
+  onFocus?: () => void;
   /** Optional layout classes for the whole row */
   className?: string;
 };
@@ -22,7 +28,10 @@ type Props = {
 export function FourSidedMeasurementsField({
   value,
   editable,
+  label,
   onChange,
+  onBlur,
+  onFocus,
   className,
 }: Props) {
   const current = value;
@@ -46,6 +55,8 @@ export function FourSidedMeasurementsField({
           editable={editable}
           label=""                      // we render the label above
           onChange={update('top')}
+          onBlur={onBlur}
+          onFocus={onFocus}
         />
       </div>
 
@@ -56,6 +67,8 @@ export function FourSidedMeasurementsField({
           editable={editable}
           label=""
           onChange={update('bottom')}
+          onBlur={onBlur}
+          onFocus={onFocus}
         />
       </div>
 
@@ -66,6 +79,8 @@ export function FourSidedMeasurementsField({
           editable={editable}
           label=""
           onChange={update('left')}
+          onBlur={onBlur}
+          onFocus={onFocus}
         />
       </div>
 
@@ -76,6 +91,8 @@ export function FourSidedMeasurementsField({
           editable={editable}
           label=""
           onChange={update('right')}
+          onBlur={onBlur}
+          onFocus={onFocus}
         />
       </div>
     </div>

@@ -1,20 +1,30 @@
 'use client';
 
 import React from 'react';
-import { HorizontalSplitSubsection, HorizontalSplit } from '@/app/schemas/comprehensiveExtensionSchema';
+import { HorizontalSplit } from '../libs/types';
+
+// Define the interface locally since it's not in the main types file
+interface HorizontalSplitSubsection {
+  subsection_label: string;
+  left_boundary: number;
+  right_boundary: number;
+  horizontal_splits: HorizontalSplit[];
+}
 
 interface HorizontalSubsectionsArrayFieldProps {
   value: HorizontalSplitSubsection[];
   editable: boolean;
   label: string;
   onChange: (value: HorizontalSplitSubsection[]) => void;
+  onBlur?: () => void;
 }
 
 export function HorizontalSubsectionsArrayField({
   value = [],
   editable,
   label,
-  onChange
+  onChange,
+  onBlur
 }: HorizontalSubsectionsArrayFieldProps) {
   
   
@@ -115,6 +125,7 @@ export function HorizontalSubsectionsArrayField({
                         step="0.125"
                         value={split.position}
                         onChange={(e) => updateHorizontalSplit(subsectionIndex, splitIndex, 'position', parseFloat(e.target.value) || 0)}
+                        onBlur={onBlur}
                         className="w-full px-2 py-1 border rounded text-sm"
                       />
                     </div>
@@ -124,6 +135,7 @@ export function HorizontalSubsectionsArrayField({
                       <select
                         value={split.direction}
                         onChange={(e) => updateHorizontalSplit(subsectionIndex, splitIndex, 'direction', e.target.value)}
+                        onBlur={onBlur}
                         className="w-full px-2 py-1 border rounded text-sm"
                       >
                         <option value="top-to-bottom">Top to Bottom</option>
