@@ -65,7 +65,6 @@ export default function MVP() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newOrder),
     });
-    alert("New order created!");
   };
 
   return (
