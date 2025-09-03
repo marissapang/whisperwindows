@@ -36,12 +36,12 @@ export function Window({
 
         <input 
           type="text" 
-          className="w-full p-2 border rounded mb-3" 
           value={value?.Window_Name || ''} 
           onChange={(e) => onChange('Window_Name', e.target.value)}
           onBlur={onBlur}
           onFocus={onFocus}
           placeholder="Window Name"
+          className="w-flex border"
         />
         -
         <div className="mt-4">
