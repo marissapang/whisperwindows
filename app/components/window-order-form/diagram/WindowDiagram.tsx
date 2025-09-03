@@ -1,12 +1,17 @@
 'use client';
 
 import { useMemo } from 'react';
+import { formatInches, windowInches as getWindowInches } from './libs/measurement';
+import { ensureLengths, paneBoundariesInches, rowBoundariesInches } from './libs/configSplits';
+import { computeExtensionGeometryInches } from './libs/extension';
+import type { ExtensionConfigModel } from '../libs/types';
 
 /** ==== Props ==== */
 type DiagramProps = {
   measurements: FourSidedMeasurements;
   windowSplits: ConfigSplits;
   panelSplits: ConfigSplits;
+  extension?: ExtensionConfigModel | null; // NEW
   svgWidth?: number;
   svgHeight?: number;
   svgPadding?: number;
@@ -22,6 +27,8 @@ const COLORS = {
   panelCellStroke: '#3B82F6',
   panelCellFill: 'rgba(59, 130, 246, 0.10)',
   label: '#374151',
+  extensionFill: 'rgba(128, 90, 213, 0.35)',  // purple with opacity
+  extensionStroke: 'rgba(128, 90, 213, 0.6)', // purple outline
 };
 
 const STROKES = {
@@ -30,45 +37,10 @@ const STROKES = {
   panelFrame: 6,
   panelSplit: 4,
   panelCellStroke: 2,
+  extension: 2,
 };
 
 /** ==== Helpers ==== */
-
-/** Format inches as mixed fraction (to nearest 1/16") like 12 3/16" */
-function formatInches(val: number): string {
-  if (!Number.isFinite(val)) return '0"';
-  const sign = val < 0 ? '-' : '';
-  const abs = Math.abs(val);
-  const whole = Math.floor(abs);
-  const frac = abs - whole;
-
-  const den = 16;
-  let num = Math.round(frac * den);
-  let w = whole;
-  if (num === den) { w += 1; num = 0; }
-
-  if (num === 0) return `${sign}${w}"`;
-
-  const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
-  const g = gcd(num, den);
-  const n = num / g;
-  const d = den / g;
-
-  if (w === 0) return `${sign}${n}/${d}"`;
-  return `${sign}${w} ${n}/${d}"`;
-}
-
-/** window width/height in inches (min edges, never negative) */
-function getWindowInches(meas: FourSidedMeasurements) {
-  const wTop = meas.top ?? 0;
-  const wBottom = meas.bottom ?? 0;
-  const hLeft = meas.left ?? 0;
-  const hRight = meas.right ?? 0;
-  return {
-    widthIn: Math.max(0, Math.min(wTop, wBottom)),
-    heightIn: Math.max(0, Math.min(hLeft, hRight)),
-  };
-}
 
 /** scaler for inches → px, preserving aspect, origin at top-left of box */
 function makeScaler(
@@ -95,18 +67,6 @@ function makeScaler(
   const hPx = (inches: number) => inches * scale;
 
   return { originX, originY, xPx, yFromBottomPx, wPx, hPx, scale };
-}
-
-/** n panes → n+1 x-boundaries (in inches). Vertical split positions sorted. */
-function paneBoundariesInches(widthIn: number, vSplits: VerticalSplit[], n: number) {
-  const xs = vSplits.map(s => s.position).slice(0, Math.max(n - 1, 0)).sort((a, b) => a - b);
-  return [0, ...xs, widthIn];
-}
-
-/** Given pane row split positions (inches from bottom), emit y-boundary list [0, ...splits, height] */
-function rowBoundariesInches(heightIn: number, splits: HorizontalSplit[]) {
-  const ys = splits.map(s => s.position).sort((a, b) => a - b);
-  return [0, ...ys, heightIn];
 }
 
 /** Normalize a ConfigSplits to exactly match:
@@ -366,12 +326,57 @@ function HorizontalSplitMarkers({
   );
 }
 
+/** ---- Extension helpers (inches → px rectangles) ---- */
+function RectInchesToPx({
+  xIn, yIn, wIn, hIn, xPx, yFromBottomPx, wPx, hPx,
+}: {
+  xIn: number; yIn: number; wIn: number; hIn: number;
+  xPx: (xin: number) => number;
+  yFromBottomPx: (yin: number) => number;
+  wPx: (win: number) => number;
+  hPx: (hin: number) => number;
+}) {
+  const x = xPx(xIn);
+  const yTop = yFromBottomPx(yIn + hIn);
+  const w = wPx(wIn);
+  const h = hPx(hIn);
+  return { x, y: yTop, w, h };
+}
+
+function ExtensionLayer({
+  widthIn, heightIn, ext,
+  xPx, yFromBottomPx, wPx, hPx,
+}: {
+  widthIn: number; heightIn: number;
+  ext?: ExtensionConfigModel | null;
+  xPx: (xin: number) => number;
+  yFromBottomPx: (yin: number) => number;
+  wPx: (win: number) => number;
+  hPx: (hin: number) => number;
+}) {
+  const { sides } = computeExtensionGeometryInches(widthIn, heightIn, ext);
+  if (!ext?.enabled || sides.length === 0) return null;
+
+  return (
+    <g fill={COLORS.extensionFill} stroke={COLORS.extensionStroke} strokeWidth={STROKES.extension}>
+      {sides.map((s, i) => {
+        const r = RectInchesToPx({
+          xIn: s.x, yIn: s.y, wIn: s.w, hIn: s.h,
+          xPx, yFromBottomPx, wPx, hPx,
+        });
+        return <rect key={i} x={r.x} y={r.y} width={r.w} height={r.h} rx={1.5} ry={1.5} />;
+      })}
+    </g>
+  );
+}
+
 /** ==== Main ==== */
 
 export default function WindowDiagram({
   measurements,
   windowSplits,
   panelSplits,
+  extension = null,            // NEW
   svgWidth = 720,
   svgHeight = 480,
   svgPadding = 20,
@@ -426,6 +431,11 @@ export default function WindowDiagram({
     height: scaler.hPx(heightIn),
   }), [scaler, widthIn, heightIn]);
 
+  const xPx = scaler.xPx;
+  const yFromBottomPx = scaler.yFromBottomPx;
+  const wPx = scaler.wPx;
+  const hPx = scaler.hPx;
+
   // normalize configs (or harmless defaults)
   const windowCfg = useMemo(
     () => (windowCfgReady ? normalizeForRender(windowSplits) : null),
@@ -441,8 +451,8 @@ export default function WindowDiagram({
     if (!windowCfg) return [];
     const n = windowCfg.config.pieces;
     const xsIn = paneBoundariesInches(widthIn, windowCfg.vertical_splits, n);
-    return xsIn.map(scaler.xPx);
-  }, [windowCfg, widthIn, scaler]);
+    return xsIn.map(xPx);
+  }, [windowCfg, widthIn, xPx]);
 
   const windowInteriorXsPx = useMemo(
     () => windowPaneXsPx.slice(1, Math.max(windowPaneXsPx.length - 1, 1)),
@@ -459,9 +469,9 @@ export default function WindowDiagram({
     if (!windowCfg) return [];
     return windowCfg.horizontal_splits.map(inner => {
       const yBoundIn = rowBoundariesInches(heightIn, inner);
-      return yBoundIn.map(scaler.yFromBottomPx);
+      return yBoundIn.map(yFromBottomPx);
     });
-  }, [windowCfg, heightIn, scaler]);
+  }, [windowCfg, heightIn, yFromBottomPx]);
 
   const windowHorizLineYsPx = useMemo(
     () => windowRowBoundaryYsPerPanePx.map(b => b.slice(1, Math.max(b.length - 1, 1))),
@@ -477,8 +487,8 @@ export default function WindowDiagram({
     if (!panelCfg) return [];
     const n = panelCfg.config.pieces;
     const xsIn = paneBoundariesInches(widthIn, panelCfg.vertical_splits, n);
-    return xsIn.map(scaler.xPx);
-  }, [panelCfg, widthIn, scaler]);
+    return xsIn.map(xPx);
+  }, [panelCfg, widthIn, xPx]);
 
   const panelInteriorXsPx = useMemo(
     () => panelPaneXsPx.slice(1, Math.max(panelPaneXsPx.length - 1, 1)),
@@ -495,9 +505,9 @@ export default function WindowDiagram({
     if (!panelCfg) return [];
     return panelCfg.horizontal_splits.map(inner => {
       const yBoundIn = rowBoundariesInches(heightIn, inner);
-      return yBoundIn.map(scaler.yFromBottomPx);
+      return yBoundIn.map(yFromBottomPx);
     });
-  }, [panelCfg, heightIn, scaler]);
+  }, [panelCfg, heightIn, yFromBottomPx]);
 
   const panelHorizLineYsPx = useMemo(
     () => panelRowBoundaryYsPerPanePx.map(b => b.slice(1, Math.max(b.length - 1, 1))),
@@ -514,6 +524,17 @@ export default function WindowDiagram({
       {/* Bounding Box */}
       <WindowBoundingBoxRect {...box} />
       <DimensionLabels box={box} widthIn={widthIn} heightIn={heightIn} />
+
+      {/* Extension ring (purple translucent) */}
+      <ExtensionLayer
+        widthIn={widthIn}
+        heightIn={heightIn}
+        ext={extension}
+        xPx={xPx}
+        yFromBottomPx={yFromBottomPx}
+        wPx={wPx}
+        hPx={hPx}
+      />
 
       {/* WINDOW (gray) */}
       {windowCfg && windowPaneXsPx.length > 0 && (

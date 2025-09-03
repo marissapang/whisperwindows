@@ -6,7 +6,9 @@ import { NumberInchesField } from './fields-generic/NumberInchesField.tsx';
 import { FourSidedMeasurementsField } from './fields-window/FourSidedMeasurementsField';
 import { ConfigSplitsField } from './fields-window/ConfigSplitsField';
 import { createEmptyConfigSplits } from './libs/constructors';
-import WindowDiagram from './WindowDiagram';
+import ExtensionField from './fields-window/ExtensionField';
+import WindowDiagram from './diagram/WindowDiagram';
+
 
 
 interface WindowProps {
@@ -79,10 +81,17 @@ export function Window({
           totalHeightIn={value?.Window_Four_Sided_Measurements.left ?? 0}
           onChange={(newValue) => onChange('Panel_Config_Dependent_Parameters', newValue)}
         />
+        <h3 className="text-xl font-semibold">Extension</h3>
+        <ExtensionField
+          value={value?.Window_Extension ?? null}
+          editable={editable}
+          onChange={(next) => onChange('Window_Extension', next)}
+        />
         <WindowDiagram
-          measurements = {value.Window_Four_Sided_Measurements}
-          windowSplits = {value.Window_Config_Dependent_Measurements}
-          panelSplits = {value.Panel_Config_Dependent_Parameters}
+          measurements={value.Window_Four_Sided_Measurements}
+          windowSplits={value.Window_Config_Dependent_Measurements}
+          panelSplits={value.Panel_Config_Dependent_Parameters}
+          extension={value.Window_Extension ?? null}
         />
 
 

@@ -18,7 +18,6 @@ export type VerticalConfigOptions =
   | { kind: 'Up-Middle-Down'; pieces: 3}
 
 
-
 // Split system interfaces
 export interface VerticalSplit {
   position: number;                           // Position in inches from LEFT edge
@@ -48,8 +47,8 @@ export interface WindowObject {
   Panel_Configs: string;
   Panel_Config_Dependent_Parameters: ConfigSplits;
 	
-	
-	extension: ExtensionConfig;
+  Window_Extension?: ExtensionConfigModel | null;
+  Panel_Frame_Config?: PanelFrameConfig | null;
 }
 
 
@@ -72,38 +71,100 @@ export interface ExtensionConfig {
   Current_Frame_Depth: number;          // Existing frame depth in inches
 }
 
-// Frame piece and cut list interfaces
-export interface FramePiece {
-  length: number;
-  material_side: 'top' | 'left' | 'bottom' | 'right';
-  material_type: MaterialType;
-  thickness: number;
-  description: string;
-}
-
-export interface CutListItem {
-  piece_name: string;
-  description: string;
-  length: number;
-  material_type: MaterialType;
-  thickness: number;
-  quantity: number;
-  side: string;
-  notes: string;
-}
-
-// Material and configuration types
-export type MaterialType = 
+// --- New shared material id and spec (optional if you already have a catalog elsewhere) ---
+export type MaterialId =
   | 'primed_pine1x2'
-  | 'primed_pine1x6' 
+  | 'primed_pine1x6'
   | 'primed_pine1x8'
   | 'primed_pine1x10'
   | 'primed_pine1x12'
   | 'pvc_1x2'
-  | 'wood_2x2';
+  | 'wood_2x2'
+  | 'composite_2x1_pvc'
+  | 'composite_u_channel';
+
+export interface MaterialSpec {
+  id: MaterialId;
+  label: string;
+  width: number;     // face width / effective frame thickness (in)
+  thickness: number; // secondary dimension (in)
+  depth?: number;
+  components?: MaterialId[];
+}
+
+// --- Feature 1: Extension + Padding + Panel Frame ---
+export type MountSide = 'interior' | 'exterior';
+
+export interface SidePadding {
+  material: MaterialId;
+  amount: number; // inches to inset that side; if 0, use material width
+}
 
 export type ExtensionConfigurationType = 
   | 'full-top' 
   | 'full-top-bottom' 
   | 'full-sides' 
   | 'full-bottom';
+
+export interface ExtensionConfigModel {
+  enabled: boolean;
+  mount: MountSide;  // interior vs exterior
+  materials: {
+    top: MaterialId;
+    left: MaterialId;
+    bottom: MaterialId;
+    right: MaterialId;
+  };
+  // override effective “width” per side if needed (inches)
+  thicknessOverride?: {
+    top?: number;
+    left?: number;
+    bottom?: number;
+    right?: number;
+  };
+  // optional paddings per side
+  paddings?: {
+    top?: SidePadding;
+    left?: SidePadding;
+    bottom?: SidePadding;
+    right?: SidePadding;
+  };
+}
+
+export interface PanelFrameConfig {
+  mount: MountSide;       // where the frame sits relative to its working box
+  railMaterial: MaterialId;
+  splitMaterial?: MaterialId; // for mullions if needed later
+}
+
+// // Frame piece and cut list interfaces
+// export interface FramePiece {
+//   length: number;
+//   material_side: 'top' | 'left' | 'bottom' | 'right';
+//   material_type: MaterialType;
+//   thickness: number;
+//   description: string;
+// }
+
+// export interface CutListItem {
+//   piece_name: string;
+//   description: string;
+//   length: number;
+//   material_type: MaterialType;
+//   thickness: number;
+//   quantity: number;
+//   side: string;
+//   notes: string;
+// }
+
+// // Material and configuration types
+// export type MaterialType = 
+//   | 'primed_pine1x2'
+//   | 'primed_pine1x6' 
+//   | 'primed_pine1x8'
+//   | 'primed_pine1x10'
+//   | 'primed_pine1x12'
+//   | 'pvc_1x2'
+//   | 'wood_2x2';
+
+
