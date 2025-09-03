@@ -175,7 +175,6 @@ export function DynamicOrderForm({
 			
 			if (data.success) {
 				setSaveStatus('saved');
-				// Don't auto-clear saved status - let user interaction clear it
 			} else {
 				console.error('Auto-save error:', data.error);
 				setSaveStatus('error');
@@ -201,7 +200,7 @@ export function DynamicOrderForm({
 	}, [handleAutoSave]);
 	
 	const handleFieldFocus = useCallback(() => {
-		// Reset save status when user clicks into a field (focus)
+		// Reset save status when user clicks into a field
 		if (saveStatus === 'saved') {
 			setSaveStatus('idle');
 			blurCountRef.current = 0; // Reset blur count when user starts editing again
@@ -216,7 +215,7 @@ export function DynamicOrderForm({
 	
 	const handleFieldChange = useCallback(() => {
 		// This is called on every change but we don't reset status here
-		// Only reset on focus (when user clicks into field)
+		// Only reset when user clicks into field
 	}, []);
 
 	// recursively calls on itself to read and render nested fields 
@@ -364,7 +363,7 @@ export function DynamicOrderForm({
 		<div className="relative">
 			{/* Auto-save indicator */}
 			<div className="fixed top-4 right-4 z-50">
-				{(saveStatus === 'pending' || saveStatus === 'saving') && (
+				{saveStatus === 'saving' && (
 					<div className="bg-white border border-gray-200 rounded-lg shadow-lg px-4 py-2 flex items-center gap-2">
 						<div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent"></div>
 						<span className="text-sm text-gray-700">Saving...</span>
