@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createBlankOrder } from "@/app/components/window-order-form/libs/constructors"; 
 import { orderMeta } from "@/app/components/window-order-form/ORDER_META"; // adjust as needed
+import { LoadingButton } from "@/app/components/LoadingButton";
 
 import { DynamicOrderForm } from "@/app/components/window-order-form/DynamicOrderForm";
 
@@ -25,6 +26,7 @@ type OrderState =
 export default function MVP() {
   const [orderId, setOrderId] = useState("");
   const [orderState, setOrderState] = useState<OrderState>({ status: "idle" });
+  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [view, setView] = useState<
     "Client" | "Sales" | "Manufacturer" | "Installer"
   >("Client");
@@ -57,15 +59,20 @@ export default function MVP() {
   };
 
   const createNewOrder = async () => {
-    const newOrder = createBlankOrder();
-    setOrderState({ status: "loaded", order: newOrder });
+    setIsCreatingOrder(true);
+    
+    try {
+      const newOrder = createBlankOrder();
+      setOrderState({ status: "loaded", order: newOrder });
 
-    await fetch("/api/orders/create", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newOrder),
-    });
-    alert("New order created!");
+      await fetch("/api/orders/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newOrder),
+      });
+    } finally {
+      setIsCreatingOrder(false);
+    }
   };
 
   return (
@@ -97,13 +104,14 @@ export default function MVP() {
       {/* Create New Order Section */}
       <div className="mb-6">
         <h2 className="text-lg font-semibold mb-2">Create New Order</h2>
-        <button
+        <LoadingButton
           onClick={createNewOrder}
+          isLoading={isCreatingOrder}
           disabled={orderState.status === "loading"}
-          className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50"
+          className="bg-green-600 hover:bg-green-700"
         >
-          {orderState.status === "loading" ? "Creating..." : "Create New Order"}
-        </button>
+          Create New Order
+        </LoadingButton>
       </div>
 
       {/* View Selection and Order Form */}
